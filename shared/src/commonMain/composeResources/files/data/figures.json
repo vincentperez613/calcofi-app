@@ -1,0 +1,274 @@
+[
+ {
+  "plate": "p189.webp",
+  "box": [
+   110,
+   143,
+   701,
+   366
+  ],
+  "size_mm": null,
+  "size_label": null,
+  "stage": null,
+  "stage_source": null,
+  "species": "Anchoa compressa",
+  "caption_taxon": null,
+  "uncertain": false,
+  "needs_review": true
+ },
+ {
+  "plate": "p189.webp",
+  "box": [
+   890,
+   143,
+   1112,
+   366
+  ],
+  "size_mm": 0.76,
+  "size_label": "0.76-0.84 mm",
+  "stage": "Egg",
+  "stage_source": "caption",
+  "species": "Anchoa compressa",
+  "caption_taxon": null,
+  "uncertain": false,
+  "needs_review": true
+ },
+ {
+  "plate": "p189.webp",
+  "box": [
+   106,
+   413,
+   784,
+   548
+  ],
+  "size_mm": 3.1,
+  "size_label": "3.1 mm",
+  "stage": "PrF",
+  "stage_source": "caption",
+  "species": "Anchoa compressa",
+  "caption_taxon": null,
+  "uncertain": false,
+  "needs_review": true
+ },
+ {
+  "plate": "p189.webp",
+  "box": [
+   106,
+   649,
+   951,
+   807
+  ],
+  "size_mm": 8.2,
+  "size_label": "8.2mm",
+  "stage": "F",
+  "stage_source": "caption",
+  "species": "Anchoa sp.",
+  "caption_taxon": "Anchoa sp.",
+  "uncertain": false,
+  "needs_review": true
+ },
+ {
+  "plate": "p189.webp",
+  "box": [
+   107,
+   918,
+   1104,
+   1138
+  ],
+  "size_mm": 11.7,
+  "size_label": "11.7 mm",
+  "stage": "PoF",
+  "stage_source": "caption",
+  "species": "A. compressa",
+  "caption_taxon": "A. compressa",
+  "uncertain": false,
+  "needs_review": true
+ },
+ {
+  "plate": "p191.webp",
+  "box": [
+   118,
+   141,
+   787,
+   530
+  ],
+  "size_mm": 3.1,
+  "size_label": "3.1 mm",
+  "stage": "PrF",
+  "stage_source": "media",
+  "species": "Anchoa delicatissima",
+  "caption_taxon": null,
+  "uncertain": false,
+  "needs_review": true
+ },
+ {
+  "plate": "p191.webp",
+  "box": [
+   941,
+   141,
+   1116,
+   530
+  ],
+  "size_mm": null,
+  "size_label": null,
+  "stage": null,
+  "stage_source": null,
+  "species": "Anchoa delicatissima",
+  "caption_taxon": null,
+  "uncertain": false,
+  "needs_review": true
+ },
+ {
+  "plate": "p191.webp",
+  "box": [
+   108,
+   655,
+   955,
+   832
+  ],
+  "size_mm": 9.0,
+  "size_label": "9.0mm",
+  "stage": "F",
+  "stage_source": "media",
+  "species": "Anchoa delicatissima",
+  "caption_taxon": null,
+  "uncertain": false,
+  "needs_review": true
+ },
+ {
+  "plate": "p191.webp",
+  "box": [
+   109,
+   942,
+   1112,
+   1174
+  ],
+  "size_mm": 15.5,
+  "size_label": "15.5 mm",
+  "stage": "PoF",
+  "stage_source": "media",
+  "species": "Anchoa delicatissima",
+  "caption_taxon": null,
+  "uncertain": false,
+  "needs_review": true
+ },
+ {
+  "plate": "p193.webp",
+  "box": [
+   100,
+   146,
+   1106,
+   1007
+  ],
+  "size_mm": 21.7,
+  "size_label": "21.7 mm",
+  "stage": "PoF",
+  "stage_source": "caption",
+  "species": "Cetengraulis mysticetus",
+  "caption_taxon": null,
+  "uncertain": false,
+  "needs_review": true
+ },
+ {
+  "plate": "p193.webp",
+  "box": [
+   101,
+   1015,
+   1076,
+   1234
+  ],
+  "size_mm": 28.6,
+  "size_label": "28.6 mm",
+  "stage": "Tr",
+  "stage_source": "caption",
+  "species": "Cetengraulis mysticetus",
+  "caption_taxon": null,
+  "uncertain": false,
+  "needs_review": true
+ },
+ {
+  "plate": "p195.webp",
+  "box": [
+   107,
+   145,
+   903,
+   462
+  ],
+  "size_mm": 7.5,
+  "size_label": "7.5 mm",
+  "stage": "PrF",
+  "stage_source": "caption",
+  "species": "Engraulis mordax",
+  "caption_taxon": null,
+  "uncertain": false,
+  "needs_review": true
+ },
+ {
+  "plate": "p195.webp",
+  "box": [
+   943,
+   145,
+   1106,
+   462
+  ],
+  "size_mm": 0.65,
+  "size_label": "0.65-0.82 mm",
+  "stage": "Egg",
+  "stage_source": "caption",
+  "species": "Moser and",
+  "caption_taxon": "Moser and",
+  "uncertain": false,
+  "needs_review": true
+ },
+ {
+  "plate": "p195.webp",
+  "box": [
+   106,
+   525,
+   961,
+   679
+  ],
+  "size_mm": 11.5,
+  "size_label": "11.5 mm",
+  "stage": "F",
+  "stage_source": "caption",
+  "species": "Engraulis mordax",
+  "caption_taxon": null,
+  "uncertain": false,
+  "needs_review": true
+ },
+ {
+  "plate": "p195.webp",
+  "box": [
+   107,
+   745,
+   1036,
+   926
+  ],
+  "size_mm": 18.4,
+  "size_label": "18.4 mm",
+  "stage": "PoF",
+  "stage_source": "media",
+  "species": "Engraulis mordax",
+  "caption_taxon": null,
+  "uncertain": false,
+  "needs_review": true
+ },
+ {
+  "plate": "p195.webp",
+  "box": [
+   105,
+   973,
+   1097,
+   1207
+  ],
+  "size_mm": 0.65,
+  "size_label": "0.65-0.82 mm",
+  "stage": "Egg",
+  "stage_source": "caption",
+  "species": "Moser and",
+  "caption_taxon": "Moser and",
+  "uncertain": false,
+  "needs_review": true
+ }
+]

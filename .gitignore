@@ -1,0 +1,60 @@
+# Gradle / Kotlin
+.gradle
+.kotlin
+**/build/
+!src/**/build/
+kotlin-js-store/
+
+# Configuración local (ruta del SDK, etc.)
+local.properties
+
+# IDEs
+*.iml
+.idea
+.vscode/
+.fleet/
+captures
+.externalNativeBuild
+.cxx
+
+# Xcode
+xcuserdata
+*.xcodeproj/*
+!*.xcodeproj/project.pbxproj
+!*.xcodeproj/xcshareddata/
+!*.xcodeproj/project.xcworkspace/
+!*.xcworkspace/contents.xcworkspacedata
+**/xcshareddata/WorkspaceSettings.xcsettings
+
+# Firma y secretos
+*.jks
+*.keystore
+keystore.properties
+signing.properties
+.env
+.env.*
+google-services.json
+GoogleService-Info.plist
+
+# Binarios generados
+*.apk
+*.aab
+*.ap_
+*.dex
+*.dmg
+*.msi
+*.deb
+
+# Logs y volcados
+*.log
+*.hprof
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Claude Code (configuración local)
+.claude/settings.local.json
+
+node_modules/
