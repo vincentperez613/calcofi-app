@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 
 /**
  * material-icons-extended no esta en las dependencias del proyecto. En vez
- * de agregarla solo para dos iconos de la barra de navegacion, se dibujan a
+ * de agregarla solo para tres iconos de la barra de navegacion, se dibujan a
  * mano con Canvas — mismo patron que las 3 ilustraciones de etapa en
  * PantallaCaptura.kt. Leen LocalContentColor.current para heredar el tinte
  * seleccionado/no-seleccionado que NavigationBarItem/NavigationRailItem ya

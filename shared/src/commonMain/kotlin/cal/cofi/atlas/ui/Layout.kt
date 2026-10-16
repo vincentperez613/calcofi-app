@@ -150,6 +150,7 @@ fun ProveedorDeLayout(content: @Composable () -> Unit) {
 @Composable
 fun ContenedorPantalla(
     modifier: Modifier = Modifier,
+    anchoCompleto: Boolean = false,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val dimensiones = LocalDimensiones.current
@@ -157,7 +158,10 @@ fun ContenedorPantalla(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .widthIn(max = dimensiones.anchoMaximoContenido)
+                .then(
+                    if (anchoCompleto) Modifier
+                    else Modifier.widthIn(max = dimensiones.anchoMaximoContenido),
+                )
                 .verticalScroll(rememberScrollState())
                 .padding(dimensiones.espaciado),
             verticalArrangement = Arrangement.spacedBy(dimensiones.espaciado),

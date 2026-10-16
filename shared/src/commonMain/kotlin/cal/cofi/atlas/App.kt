@@ -87,16 +87,15 @@ fun App() {
 }
 
 /**
- * Dueno de la seccion activa (Analisis / Historial) y de la barra que la
+ * Dueno de la seccion activa (Analisis / Especies / Historial) y de la barra que la
  * elige: NavigationRail a la izquierda en AMPLIO, NavigationBar abajo en
  * COMPACTO/MEDIO. Las pantallas no conocen esta navegacion.
  *
- * FlujoAnalisis y PantallaHistorial quedan SIEMPRE compuestos como
- * hermanos dentro de un Box, alternando solo su tamano (0.dp vs
- * fillMaxSize) segun la seccion activa. Si en cambio se gatearan con un
- * if/when sobre la llamada al composable, cambiar de seccion destruiria
- * el remember de la que quedo afuera — y perder el progreso a mitad de
- * una identificacion es justo lo que no se puede permitir en campo.
+ * Las secciones quedan SIEMPRE compuestas como hermanos dentro de un Box,
+ * alternando solo su tamano (0.dp vs fillMaxSize) segun la seccion activa.
+ * Un if/when que solo compusiera la pantalla activa destruiria el remember
+ * de las demas — y perder el progreso a mitad de una identificacion es
+ * justo lo que no se puede permitir en campo.
  */
 @Composable
 private fun AppConNavegacion(data: AtlasData) {
@@ -114,7 +113,7 @@ private fun AppConNavegacion(data: AtlasData) {
                 FlujoAnalisis(data)
             }
             Box(if (seccion == Seccion.ESPECIES) Modifier.fillMaxSize() else Modifier.size(0.dp)) {
-                PantallaEspecies(data = data, activa = seccion == Seccion.ESPECIES)
+                PantallaEspecies(data = data)
             }
             Box(if (seccion == Seccion.HISTORIAL) Modifier.fillMaxSize() else Modifier.size(0.dp)) {
                 PantallaHistorial(activa = seccion == Seccion.HISTORIAL)

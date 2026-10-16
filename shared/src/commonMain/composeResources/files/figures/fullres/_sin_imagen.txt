@@ -1,0 +1,14 @@
+Albulidae	Alhula Sp.	el atlas no trae lamina asignable a esta ficha
+Bathylagidae	Bathylagus nigrigenys	el atlas no trae lamina asignable a esta ficha
+Blenniidae	Entomacrodus chiostictus	el atlas no trae lamina asignable a esta ficha
+Bothidae	Bothus leopardinus	el atlas no trae lamina asignable a esta ficha
+Eleotridae	Dormitator latifrons*	el atlas no trae lamina asignable a esta ficha
+Incertae Sedis	Thalassenchelys coheni*	el atlas no trae lamina asignable a esta ficha
+Lutjanidae	Lutjanus novemfasciatus	el atlas no trae lamina asignable a esta ficha
+Malacanthidae	eaulolali/us princeps	el atlas no trae lamina asignable a esta ficha
+Malacosteidae	Aristostomias scintillans	el atlas no trae lamina asignable a esta ficha
+Myctophidae	Lampanyctus tenuiformis*	el atlas no trae lamina asignable a esta ficha
+Myctophidae	Protomyctophum crockeri	el atlas no trae lamina asignable a esta ficha
+Myctopiddae	Benthosema panamense	el atlas no trae lamina asignable a esta ficha
+Nematistiidae	Nematistius pectoralis	el atlas no trae lamina asignable a esta ficha
+Osmeridae	Hypomesus pretiosus	el atlas no trae lamina asignable a esta ficha
