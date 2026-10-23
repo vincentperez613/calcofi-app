@@ -124,6 +124,11 @@ fun PantallaCaptura(
             valor = estado.zonaColecta,
             onValorCambia = { onCambio(estado.copy(zonaColecta = sanitizarZona(it))) },
             etiqueta = "Collection locality (optional)",
+            // Las mismas formas en que el atlas describe la distribucion
+            // ("Bahia Magdalena, Baja California Sur", "Gulf of California",
+            // "ca. 30° N"): con eso el tecnico decide en el resultado si su
+            // zona cae dentro.
+            ejemplo = "e.g. Ensenada, B.C.; Gulf of California; CalCOFI line 90, station 30; 31.5°N 116.8°W",
         )
 
         // Siempre clickeable: al intentar continuar con algo incompleto,

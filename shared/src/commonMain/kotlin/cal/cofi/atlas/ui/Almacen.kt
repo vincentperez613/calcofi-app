@@ -215,7 +215,7 @@ object Almacen {
     /** Una fila por sesion; las observaciones van en una columna por caracter distinto. */
     fun exportarCsv(): String {
         val sesiones = listar()
-        return AlmacenamientoPlataforma.compartirCsv(construirCsv(sesiones), "calcofilarvas_sessions.csv")
+        return AlmacenamientoPlataforma.compartirCsv(construirCsv(sesiones), "calcofilarvae_sessions.csv")
     }
 }
 

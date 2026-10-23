@@ -1,0 +1,438 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Instalador MSI de CalcofiLarvae: el main.wxs de jpackage (JDK 21) con una
+  interfaz propia. jpackage toma este archivo de su resource-dir en lugar del
+  suyo; los archivos de la app y los accesos directos (bundle.wxf) los sigue
+  generando el. Se construye con :desktopApp:packageMsiInstalador.
+
+  Diferencias con el main.wxs original de jpackage:
+  - UIRef a CalcofiUI en vez de JpUI (que nunca se enlaza).
+  - Tres modos con textos propios, decididos al arrancar: instalacion nueva,
+    actualizacion (hay otra version con el mismo UpgradeCode, mayor o menor)
+    y mantenimiento (esta misma version ya instalada: reparar / quitar).
+  - Acceso directo en el escritorio como checkbox ANTES de instalar (en la
+    pantalla de confirmacion), no al final: cuando aparece la pantalla final
+    la instalacion ya termino y el MSI no puede agregar archivos.
+  - "Launch CalcofiLarvae" al final, marcado por default.
+  - La carpeta de instalacion se guarda en el registro, y una actualizacion
+    instala en la misma carpeta sin volver a preguntar.
+
+  Los bitmaps (banner.bmp, dialog.bmp) se leen de la variable de entorno
+  CALCOFI_WIX_RECURSOS, que pone el task de Gradle: jpackage no copia al
+  directorio de trabajo de WiX nada que no sea suyo.
+-->
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+
+  <?ifdef JpIsSystemWide ?>
+    <?define JpInstallScope="perMachine"?>
+    <?define CalcofiRaizRegistro="HKLM"?>
+  <?else?>
+    <?define JpInstallScope="perUser"?>
+    <?define CalcofiRaizRegistro="HKCU"?>
+  <?endif?>
+
+  <?define JpProductLanguage=1033 ?>
+  <?define JpInstallerVersion=200 ?>
+  <?define JpCompressedMsi=yes ?>
+
+  <?define CalcofiRecursos=$(env.CALCOFI_WIX_RECURSOS) ?>
+
+  <?include $(var.JpConfigDir)/overrides.wxi ?>
+
+  <?ifdef JpAllowUpgrades ?>
+    <?define JpUpgradeVersionOnlyDetectUpgrade="no"?>
+  <?else?>
+    <?define JpUpgradeVersionOnlyDetectUpgrade="yes"?>
+  <?endif?>
+  <?ifdef JpAllowDowngrades ?>
+    <?define JpUpgradeVersionOnlyDetectDowngrade="no"?>
+  <?else?>
+    <?define JpUpgradeVersionOnlyDetectDowngrade="yes"?>
+  <?endif?>
+
+  <Product
+    Id="$(var.JpProductCode)"
+    Name="$(var.JpAppName)"
+    Language="$(var.JpProductLanguage)"
+    Version="$(var.JpAppVersion)"
+    Manufacturer="$(var.JpAppVendor)"
+    UpgradeCode="$(var.JpProductUpgradeCode)">
+
+    <Package
+      Description="$(var.JpAppDescription)"
+      Manufacturer="$(var.JpAppVendor)"
+      InstallerVersion="$(var.JpInstallerVersion)"
+      Compressed="$(var.JpCompressedMsi)"
+      InstallScope="$(var.JpInstallScope)" Platform="x64"
+    />
+
+    <Media Id="1" Cabinet="Data.cab" EmbedCab="yes" />
+
+    <Upgrade Id="$(var.JpProductUpgradeCode)">
+      <UpgradeVersion
+        OnlyDetect="$(var.JpUpgradeVersionOnlyDetectUpgrade)"
+        Property="JP_UPGRADABLE_FOUND"
+        Maximum="$(var.JpAppVersion)"
+        MigrateFeatures="yes"
+        IncludeMaximum="$(var.JpUpgradeVersionOnlyDetectUpgrade)" />
+      <UpgradeVersion
+        OnlyDetect="$(var.JpUpgradeVersionOnlyDetectDowngrade)"
+        Property="JP_DOWNGRADABLE_FOUND"
+        Minimum="$(var.JpAppVersion)"
+        MigrateFeatures="yes"
+        IncludeMinimum="$(var.JpUpgradeVersionOnlyDetectDowngrade)" />
+    </Upgrade>
+
+    <?ifndef JpAllowUpgrades ?>
+    <CustomAction Id="JpDisallowUpgrade" Error="!(loc.DisallowUpgradeErrorMessage)" />
+    <?endif?>
+    <?ifndef JpAllowDowngrades ?>
+    <CustomAction Id="JpDisallowDowngrade" Error="!(loc.DowngradeErrorMessage)" />
+    <?endif?>
+
+    <Binary Id="JpCaDll" SourceFile="wixhelper.dll"/>
+
+    <CustomAction Id="JpFindRelatedProducts" BinaryKey="JpCaDll" DllEntry="FindRelatedProductsEx" />
+
+    <!-- Standard required root -->
+    <Directory Id="TARGETDIR" Name="SourceDir"/>
+
+    <Feature Id="DefaultFeature" Title="!(loc.MainFeatureTitle)" Level="1">
+      <ComponentGroupRef Id="Shortcuts"/>
+      <ComponentGroupRef Id="Files"/>
+      <ComponentGroupRef Id="FileAssociations"/>
+      <ComponentRef Id="CalcofiCarpetaRecordada"/>
+    </Feature>
+
+    <CustomAction Id="JpSetARPINSTALLLOCATION" Property="ARPINSTALLLOCATION" Value="[INSTALLDIR]" />
+    <CustomAction Id="JpSetARPCOMMENTS" Property="ARPCOMMENTS" Value="$(var.JpAppDescription)" />
+    <CustomAction Id="JpSetARPCONTACT" Property="ARPCONTACT" Value="$(var.JpAppVendor)" />
+    <CustomAction Id="JpSetARPSIZE" Property="ARPSIZE" Value="$(var.JpAppSizeKb)" />
+
+    <?ifdef JpHelpURL ?>
+      <CustomAction Id="JpSetARPHELPLINK" Property="ARPHELPLINK" Value="$(var.JpHelpURL)" />
+    <?endif?>
+
+    <?ifdef JpAboutURL ?>
+      <CustomAction Id="JpSetARPURLINFOABOUT" Property="ARPURLINFOABOUT" Value="$(var.JpAboutURL)" />
+    <?endif?>
+
+    <?ifdef JpUpdateURL ?>
+      <CustomAction Id="JpSetARPURLUPDATEINFO" Property="ARPURLUPDATEINFO" Value="$(var.JpUpdateURL)" />
+    <?endif?>
+
+    <?ifdef JpIcon ?>
+    <Property Id="ARPPRODUCTICON" Value="JpARPPRODUCTICON"/>
+    <Icon Id="JpARPPRODUCTICON" SourceFile="$(var.JpIcon)"/>
+    <?endif?>
+
+    <!-- ===================================================== carpeta recordada
+
+      INSTALLDIR sale del registro si una version anterior lo guardo; si no,
+      queda la carpeta por default de bundle.wxf. AppSearch corre antes que
+      RemoveExistingProducts, asi que el valor se lee antes de que la version
+      vieja lo borre al desinstalarse.
+    -->
+    <Property Id="INSTALLDIR" Secure="yes">
+      <RegistrySearch Id="CalcofiBuscarCarpeta" Root="$(var.CalcofiRaizRegistro)"
+                      Key="Software\$(var.JpAppName)" Name="InstallDir" Type="raw" Win64="yes"/>
+    </Property>
+
+    <DirectoryRef Id="INSTALLDIR">
+      <Component Id="CalcofiCarpetaRecordada" Guid="{4F3E6BD4-62C2-4093-8733-31762DF7BB71}" Win64="yes">
+        <RegistryValue Root="$(var.CalcofiRaizRegistro)" Key="Software\$(var.JpAppName)" Name="InstallDir"
+                       Type="string" Value="[INSTALLDIR]" KeyPath="yes"/>
+      </Component>
+    </DirectoryRef>
+
+    <!-- ================================================ acceso en el escritorio
+
+      bundle.wxf (con -win-shortcut-prompt) condiciona el acceso directo a
+      JP_INSTALL_DESKTOP_SHORTCUT, pero ahi esa propiedad no es Secure: en una
+      instalacion por maquina, con un usuario sin permisos que eleva con
+      credenciales de otro, Windows no la pasa del dialogo a la instalacion.
+      El checkbox usa una propia que si es Secure y se copia a la de jpackage
+      ya del lado de la instalacion, antes de que se evaluen las condiciones.
+      Vacia, la copia borra JP_INSTALL_DESKTOP_SHORTCUT: sin acceso directo.
+
+      Tambien sirve sin interfaz: msiexec /i ... /qn CREATE_DESKTOP_SHORTCUT=""
+    -->
+    <Property Id="CREATE_DESKTOP_SHORTCUT" Value="1" Secure="yes"/>
+    <CustomAction Id="CalcofiCopiarEleccionAcceso" Property="JP_INSTALL_DESKTOP_SHORTCUT"
+                  Value="[CREATE_DESKTOP_SHORTCUT]"/>
+
+    <!-- ===================================================== abrir al terminar -->
+    <Property Id="CalcofiAbrir" Value="1"/>
+    <Property Id="WixShellExecTarget" Value="[INSTALLDIR]$(var.JpAppName).exe"/>
+    <CustomAction Id="CalcofiAbrirApp" BinaryKey="WixCA" DllEntry="WixShellExec" Impersonate="yes" Return="ignore"/>
+
+    <!-- ============================================================ textos
+
+      Default: instalacion nueva. Al arrancar, despues de buscar versiones
+      instaladas, se pisan para actualizacion o mantenimiento. Los dialogos
+      solo muestran [CalcofiX]; no deciden nada.
+    -->
+    <Property Id="CalcofiBienvenidaTitulo" Value="Install $(var.JpAppName) $(var.JpAppVersion)"/>
+    <Property Id="CalcofiBienvenidaTexto" Value="Larval fish identification with the CalCOFI Atlas 33.&#13;&#10;&#13;&#10;Setup will install $(var.JpAppName) on this computer. Click Next to continue, or Cancel to exit."/>
+    <Property Id="CalcofiListoTitulo" Value="Ready to install"/>
+    <Property Id="CalcofiListoDescripcion" Value="Review the installation options."/>
+    <Property Id="CalcofiListoTexto" Value="$(var.JpAppName) $(var.JpAppVersion) will be installed in:"/>
+    <Property Id="CalcofiBoton" Value="&amp;Install"/>
+    <Property Id="CalcofiProgresoTitulo" Value="Installing $(var.JpAppName)"/>
+    <Property Id="CalcofiProgresoTexto" Value="Please wait while $(var.JpAppName) is installed."/>
+    <Property Id="CalcofiFinTitulo" Value="$(var.JpAppName) is installed"/>
+    <Property Id="CalcofiFinTexto" Value="$(var.JpAppName) $(var.JpAppVersion) was installed successfully."/>
+
+    <!-- Actualizacion: hay otra version (mayor o menor) con el mismo UpgradeCode. -->
+    <SetProperty Id="CalcofiActualiza" Value="1" Sequence="ui" After="JpFindRelatedProducts">
+      NOT Installed AND (JP_UPGRADABLE_FOUND OR JP_DOWNGRADABLE_FOUND)
+    </SetProperty>
+    <SetProperty Id="CalcofiBienvenidaTitulo" Action="CalcofiTextoActualizar1" Sequence="ui" After="SetCalcofiActualiza"
+                 Value="Update $(var.JpAppName) to $(var.JpAppVersion)">CalcofiActualiza</SetProperty>
+    <SetProperty Id="CalcofiBienvenidaTexto" Action="CalcofiTextoActualizar2" Sequence="ui" After="CalcofiTextoActualizar1"
+                 Value="A previous version of $(var.JpAppName) is installed on this computer. Setup will replace it with version $(var.JpAppVersion).&#13;&#10;&#13;&#10;Your saved sessions and history are kept. Click Next to continue, or Cancel to exit.">CalcofiActualiza</SetProperty>
+    <SetProperty Id="CalcofiBienvenidaTexto" Action="CalcofiTextoRegresar" Sequence="ui" After="CalcofiTextoActualizar2"
+                 Value="A newer version of $(var.JpAppName) is installed on this computer. Setup will replace it with the older version $(var.JpAppVersion).&#13;&#10;&#13;&#10;Your saved sessions and history are kept. Click Next to continue, or Cancel to exit.">NOT Installed AND JP_DOWNGRADABLE_FOUND</SetProperty>
+    <SetProperty Id="CalcofiListoTitulo" Action="CalcofiTextoActualizar3" Sequence="ui" After="CalcofiTextoRegresar"
+                 Value="Ready to update">CalcofiActualiza</SetProperty>
+    <SetProperty Id="CalcofiListoTexto" Action="CalcofiTextoActualizar4" Sequence="ui" After="CalcofiTextoActualizar3"
+                 Value="$(var.JpAppName) will be updated to version $(var.JpAppVersion) in:">CalcofiActualiza</SetProperty>
+    <SetProperty Id="CalcofiBoton" Action="CalcofiTextoActualizar5" Sequence="ui" After="CalcofiTextoActualizar4"
+                 Value="&amp;Update">CalcofiActualiza</SetProperty>
+    <SetProperty Id="CalcofiProgresoTitulo" Action="CalcofiTextoActualizar6" Sequence="ui" After="CalcofiTextoActualizar5"
+                 Value="Updating $(var.JpAppName)">CalcofiActualiza</SetProperty>
+    <SetProperty Id="CalcofiProgresoTexto" Action="CalcofiTextoActualizar7" Sequence="ui" After="CalcofiTextoActualizar6"
+                 Value="Please wait while $(var.JpAppName) is updated to version $(var.JpAppVersion).">CalcofiActualiza</SetProperty>
+    <SetProperty Id="CalcofiFinTitulo" Action="CalcofiTextoActualizar8" Sequence="ui" After="CalcofiTextoActualizar7"
+                 Value="$(var.JpAppName) is updated">CalcofiActualiza</SetProperty>
+    <SetProperty Id="CalcofiFinTexto" Action="CalcofiTextoActualizar9" Sequence="ui" After="CalcofiTextoActualizar8"
+                 Value="$(var.JpAppName) was updated to version $(var.JpAppVersion). Your saved sessions and history were kept.">CalcofiActualiza</SetProperty>
+
+    <!-- Mantenimiento: esta misma version ya esta instalada (reparar / quitar). -->
+    <SetProperty Id="CalcofiProgresoTitulo" Action="CalcofiTextoMantener1" Sequence="ui" After="CalcofiTextoActualizar9"
+                 Value="Applying changes">Installed</SetProperty>
+    <SetProperty Id="CalcofiProgresoTexto" Action="CalcofiTextoMantener2" Sequence="ui" After="CalcofiTextoMantener1"
+                 Value="Please wait while Setup applies the changes to $(var.JpAppName).">Installed</SetProperty>
+    <SetProperty Id="CalcofiFinTitulo" Action="CalcofiTextoMantener3" Sequence="ui" After="CalcofiTextoMantener2"
+                 Value="Setup completed">Installed</SetProperty>
+    <SetProperty Id="CalcofiFinTexto" Action="CalcofiTextoMantener4" Sequence="ui" After="CalcofiTextoMantener3"
+                 Value="Click Finish to exit.">Installed</SetProperty>
+
+    <UIRef Id="CalcofiUI"/>
+
+    <InstallExecuteSequence>
+      <Custom Action="JpSetARPINSTALLLOCATION" After="CostFinalize">Not Installed</Custom>
+      <Custom Action="JpSetARPCOMMENTS" After="CostFinalize">Not Installed</Custom>
+      <Custom Action="JpSetARPCONTACT" After="CostFinalize">Not Installed</Custom>
+      <Custom Action="JpSetARPSIZE" After="CostFinalize">Not Installed</Custom>
+      <?ifdef JpHelpURL ?>
+        <Custom Action="JpSetARPHELPLINK" After="CostFinalize">Not Installed</Custom>
+      <?endif?>
+      <?ifdef JpAboutURL ?>
+        <Custom Action="JpSetARPURLINFOABOUT" After="CostFinalize">Not Installed</Custom>
+      <?endif?>
+      <?ifdef JpUpdateURL ?>
+        <Custom Action="JpSetARPURLUPDATEINFO" After="CostFinalize">Not Installed</Custom>
+      <?endif?>
+
+      <?ifndef JpAllowUpgrades ?>
+      <Custom Action="JpDisallowUpgrade" After="JpFindRelatedProducts">JP_UPGRADABLE_FOUND</Custom>
+      <?endif?>
+      <?ifndef JpAllowDowngrades ?>
+      <Custom Action="JpDisallowDowngrade" After="JpFindRelatedProducts">JP_DOWNGRADABLE_FOUND</Custom>
+      <?endif?>
+      <RemoveExistingProducts Before="CostInitialize"/>
+      <Custom Action="JpFindRelatedProducts" After="FindRelatedProducts"/>
+      <Custom Action="CalcofiCopiarEleccionAcceso" Before="CostFinalize">NOT Installed</Custom>
+    </InstallExecuteSequence>
+
+    <InstallUISequence>
+      <Custom Action="JpFindRelatedProducts" After="FindRelatedProducts"/>
+    </InstallUISequence>
+
+  </Product>
+
+  <!-- ================================================================ interfaz
+
+    Basada en WixUI_InstallDir. Propios: bienvenida, confirmacion, progreso y
+    final. De WixUI: carpeta, examinar, mantenimiento (reparar / quitar) y los
+    de error, cancelar y espacio en disco.
+
+    Instalar:      Bienvenida -> Carpeta -> Confirmacion -> Progreso -> Final
+    Actualizar:    Bienvenida -> Confirmacion -> Progreso -> Final
+    Mantenimiento: MaintenanceWelcomeDlg -> MaintenanceTypeDlg -> VerifyReadyDlg
+  -->
+  <Fragment>
+    <WixVariable Id="WixUIBannerBmp" Value="$(var.CalcofiRecursos)\banner.bmp"/>
+    <WixVariable Id="WixUIDialogBmp" Value="$(var.CalcofiRecursos)\dialog.bmp"/>
+
+    <UI Id="CalcofiUI">
+      <TextStyle Id="WixUI_Font_Normal" FaceName="Segoe UI" Size="8"/>
+      <TextStyle Id="WixUI_Font_Bigger" FaceName="Segoe UI" Size="12"/>
+      <TextStyle Id="WixUI_Font_Title" FaceName="Segoe UI" Size="9" Bold="yes"/>
+      <TextStyle Id="Calcofi_Font_Titular" FaceName="Segoe UI Semibold" Size="14"/>
+      <Property Id="DefaultUIFont" Value="WixUI_Font_Normal"/>
+      <Property Id="WixUI_Mode" Value="InstallDir"/>
+      <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR"/>
+      <Property Id="ARPNOMODIFY" Value="1"/>
+
+      <DialogRef Id="BrowseDlg"/>
+      <DialogRef Id="DiskCostDlg"/>
+      <DialogRef Id="ErrorDlg"/>
+      <DialogRef Id="FatalError"/>
+      <DialogRef Id="FilesInUse"/>
+      <DialogRef Id="MsiRMFilesInUse"/>
+      <DialogRef Id="PrepareDlg"/>
+      <DialogRef Id="ResumeDlg"/>
+      <DialogRef Id="UserExit"/>
+      <DialogRef Id="InstallDirDlg"/>
+      <DialogRef Id="MaintenanceWelcomeDlg"/>
+      <DialogRef Id="MaintenanceTypeDlg"/>
+      <DialogRef Id="VerifyReadyDlg"/>
+      <DialogRef Id="WaitForCostingDlg"/>
+      <DialogRef Id="OutOfDiskDlg"/>
+      <DialogRef Id="OutOfRbDiskDlg"/>
+
+      <!-- ======== bienvenida -->
+      <Dialog Id="CalcofiBienvenidaDlg" Width="370" Height="270" Title="[ProductName] Setup">
+        <Control Id="Imagen" Type="Bitmap" X="0" Y="0" Width="370" Height="234" TabSkip="no" Text="WixUI_Bmp_Dialog"/>
+        <Control Id="Titulo" Type="Text" X="135" Y="20" Width="220" Height="45" Transparent="yes" NoPrefix="yes"
+                 Text="{\Calcofi_Font_Titular}[CalcofiBienvenidaTitulo]"/>
+        <Control Id="Texto" Type="Text" X="135" Y="72" Width="220" Height="130" Transparent="yes" NoPrefix="yes"
+                 Text="[CalcofiBienvenidaTexto]"/>
+        <Control Id="LineaInferior" Type="Line" X="0" Y="234" Width="370" Height="0"/>
+        <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Disabled="yes" Text="&amp;Back"/>
+        <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="&amp;Next">
+          <Publish Event="NewDialog" Value="InstallDirDlg">NOT CalcofiActualiza</Publish>
+          <Publish Event="NewDialog" Value="CalcofiListoDlg">CalcofiActualiza</Publish>
+        </Control>
+        <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="Cancel">
+          <Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
+        </Control>
+      </Dialog>
+
+      <!-- ======== confirmacion -->
+      <Dialog Id="CalcofiListoDlg" Width="370" Height="270" Title="[ProductName] Setup" TrackDiskSpace="yes">
+        <Control Id="Banner" Type="Bitmap" X="0" Y="0" Width="370" Height="44" TabSkip="no" Text="WixUI_Bmp_Banner"/>
+        <Control Id="Titulo" Type="Text" X="15" Y="6" Width="300" Height="15" Transparent="yes" NoPrefix="yes"
+                 Text="{\WixUI_Font_Title}[CalcofiListoTitulo]"/>
+        <Control Id="Descripcion" Type="Text" X="25" Y="23" Width="280" Height="15" Transparent="yes" NoPrefix="yes"
+                 Text="[CalcofiListoDescripcion]"/>
+        <Control Id="LineaBanner" Type="Line" X="0" Y="44" Width="370" Height="0"/>
+        <Control Id="Texto" Type="Text" X="25" Y="62" Width="320" Height="15" NoPrefix="yes" Text="[CalcofiListoTexto]"/>
+        <Control Id="Carpeta" Type="Text" X="25" Y="79" Width="320" Height="30" NoPrefix="yes" Text="[INSTALLDIR]"/>
+        <Control Id="AccesoEscritorio" Type="CheckBox" X="25" Y="125" Width="320" Height="17"
+                 Property="CREATE_DESKTOP_SHORTCUT" CheckBoxValue="1" Text="Create a &amp;desktop shortcut"/>
+        <Control Id="LineaInferior" Type="Line" X="0" Y="234" Width="370" Height="0"/>
+        <Control Id="Back" Type="PushButton" X="156" Y="243" Width="56" Height="17" Text="&amp;Back">
+          <Publish Event="NewDialog" Value="InstallDirDlg">NOT CalcofiActualiza</Publish>
+          <Publish Event="NewDialog" Value="CalcofiBienvenidaDlg">CalcofiActualiza</Publish>
+        </Control>
+        <Control Id="Instalar" Type="PushButton" X="212" Y="243" Width="80" Height="17" Default="yes"
+                 ElevationShield="yes" Text="[CalcofiBoton]">
+          <!-- Lo mismo que hace el boton Install de VerifyReadyDlg de WixUI. -->
+          <Publish Event="SpawnWaitDialog" Value="WaitForCostingDlg" Order="1">CostingComplete = 1</Publish>
+          <Publish Event="EndDialog" Value="Return" Order="2"><![CDATA[OutOfDiskSpace <> 1]]></Publish>
+          <Publish Event="SpawnDialog" Value="OutOfRbDiskDlg" Order="3">OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND (PROMPTROLLBACKCOST="P" OR NOT PROMPTROLLBACKCOST)</Publish>
+          <Publish Event="EndDialog" Value="Return" Order="4">OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND PROMPTROLLBACKCOST="D"</Publish>
+          <Publish Event="EnableRollback" Value="False" Order="5">OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND PROMPTROLLBACKCOST="D"</Publish>
+          <Publish Event="SpawnDialog" Value="OutOfDiskDlg" Order="6">(OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 1) OR (OutOfDiskSpace = 1 AND PROMPTROLLBACKCOST="F")</Publish>
+        </Control>
+        <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="Cancel">
+          <Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
+        </Control>
+      </Dialog>
+
+      <!-- ======== progreso -->
+      <Dialog Id="CalcofiProgresoDlg" Width="370" Height="270" Title="[ProductName] Setup" Modeless="yes">
+        <Control Id="Banner" Type="Bitmap" X="0" Y="0" Width="370" Height="44" TabSkip="no" Text="WixUI_Bmp_Banner"/>
+        <Control Id="Titulo" Type="Text" X="15" Y="6" Width="300" Height="15" Transparent="yes" NoPrefix="yes"
+                 Text="{\WixUI_Font_Title}[CalcofiProgresoTitulo]"/>
+        <Control Id="LineaBanner" Type="Line" X="0" Y="44" Width="370" Height="0"/>
+        <Control Id="Texto" Type="Text" X="25" Y="62" Width="320" Height="30" NoPrefix="yes" Text="[CalcofiProgresoTexto]"/>
+        <Control Id="Estado" Type="Text" X="25" Y="100" Width="320" Height="12" NoPrefix="yes">
+          <Subscribe Event="ActionText" Attribute="Text"/>
+        </Control>
+        <Control Id="Barra" Type="ProgressBar" X="25" Y="115" Width="320" Height="10" ProgressBlocks="yes" Text="Progress">
+          <Subscribe Event="SetProgress" Attribute="Progress"/>
+        </Control>
+        <Control Id="LineaInferior" Type="Line" X="0" Y="234" Width="370" Height="0"/>
+        <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Disabled="yes" Text="&amp;Back"/>
+        <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Disabled="yes" Text="&amp;Next"/>
+        <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Default="yes" Cancel="yes" Text="Cancel">
+          <Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
+        </Control>
+      </Dialog>
+
+      <!-- ======== final
+
+        El checkbox va sin texto y angosto, con su etiqueta aparte: un
+        checkbox de MSI pinta su propio fondo gris encima de la imagen.
+      -->
+      <Dialog Id="CalcofiFinDlg" Width="370" Height="270" Title="[ProductName] Setup">
+        <Control Id="Imagen" Type="Bitmap" X="0" Y="0" Width="370" Height="234" TabSkip="no" Text="WixUI_Bmp_Dialog"/>
+        <Control Id="Titulo" Type="Text" X="135" Y="20" Width="220" Height="45" Transparent="yes" NoPrefix="yes"
+                 Text="{\Calcofi_Font_Titular}[CalcofiFinTitulo]"/>
+        <Control Id="Texto" Type="Text" X="135" Y="72" Width="220" Height="100" Transparent="yes" NoPrefix="yes"
+                 Text="[CalcofiFinTexto]"/>
+        <Control Id="Abrir" Type="CheckBox" X="135" Y="196" Width="10" Height="10" Hidden="yes"
+                 Property="CalcofiAbrir" CheckBoxValue="1">
+          <Condition Action="show">NOT Installed</Condition>
+        </Control>
+        <Control Id="AbrirEtiqueta" Type="Text" X="149" Y="196" Width="200" Height="10" Transparent="yes" NoPrefix="yes"
+                 Hidden="yes" Text="Launch [ProductName]">
+          <Condition Action="show">NOT Installed</Condition>
+        </Control>
+        <Control Id="LineaInferior" Type="Line" X="0" Y="234" Width="370" Height="0"/>
+        <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Disabled="yes" Text="&amp;Back"/>
+        <Control Id="Finish" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Cancel="yes" Text="&amp;Finish">
+          <Publish Event="DoAction" Value="CalcofiAbrirApp" Order="1">CalcofiAbrir AND NOT Installed</Publish>
+          <Publish Event="EndDialog" Value="Return" Order="2">1</Publish>
+        </Control>
+        <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Disabled="yes" Text="Cancel"/>
+      </Dialog>
+
+      <!-- ======== navegacion de WixUI -->
+      <Publish Dialog="BrowseDlg" Control="OK" Event="DoAction" Value="WixUIValidatePath" Order="3">1</Publish>
+      <Publish Dialog="BrowseDlg" Control="OK" Event="SpawnDialog" Value="InvalidDirDlg" Order="4"><![CDATA[NOT WIXUI_DONTVALIDATEPATH AND WIXUI_INSTALLDIR_VALID<>"1"]]></Publish>
+
+      <Publish Dialog="InstallDirDlg" Control="Back" Event="NewDialog" Value="CalcofiBienvenidaDlg">1</Publish>
+      <Publish Dialog="InstallDirDlg" Control="Next" Event="SetTargetPath" Value="[WIXUI_INSTALLDIR]" Order="1">1</Publish>
+      <Publish Dialog="InstallDirDlg" Control="Next" Event="DoAction" Value="WixUIValidatePath" Order="2">NOT WIXUI_DONTVALIDATEPATH</Publish>
+      <Publish Dialog="InstallDirDlg" Control="Next" Event="SpawnDialog" Value="InvalidDirDlg" Order="3"><![CDATA[NOT WIXUI_DONTVALIDATEPATH AND WIXUI_INSTALLDIR_VALID<>"1"]]></Publish>
+      <Publish Dialog="InstallDirDlg" Control="Next" Event="NewDialog" Value="CalcofiListoDlg" Order="4">WIXUI_DONTVALIDATEPATH OR WIXUI_INSTALLDIR_VALID="1"</Publish>
+      <Publish Dialog="InstallDirDlg" Control="ChangeFolder" Property="_BrowseProperty" Value="[WIXUI_INSTALLDIR]" Order="1">1</Publish>
+      <Publish Dialog="InstallDirDlg" Control="ChangeFolder" Event="SpawnDialog" Value="BrowseDlg" Order="2">1</Publish>
+
+      <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="MaintenanceTypeDlg">1</Publish>
+      <Publish Dialog="MaintenanceTypeDlg" Control="RepairButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
+      <Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
+      <Publish Dialog="MaintenanceTypeDlg" Control="Back" Event="NewDialog" Value="MaintenanceWelcomeDlg">1</Publish>
+      <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg">1</Publish>
+
+      <!--
+        ProgressDlg de WixUI se enlaza igual (algun dialogo de WixUI lo
+        referencia) y trae su propio Show justo antes de ExecuteAction: el
+        ultimo dialogo sin modo que se muestra reemplaza al anterior, asi que
+        taparia al nuestro. Se pisa su Show (es Overridable) con condicion 0,
+        y el nuestro va fijo en 1299, despues de bienvenida, mantenimiento y
+        ResumeDlg (que se ordenan antes de ProgressDlg) y antes de
+        ExecuteAction (1300).
+      -->
+      <InstallUISequence>
+        <Show Dialog="ProgressDlg" Sequence="1290">0</Show>
+        <Show Dialog="CalcofiBienvenidaDlg" Before="ProgressDlg">NOT Installed</Show>
+        <Show Dialog="CalcofiProgresoDlg" Sequence="1299"/>
+        <Show Dialog="CalcofiFinDlg" OnExit="success"/>
+      </InstallUISequence>
+      <AdminUISequence>
+        <Show Dialog="ProgressDlg" Sequence="1290">0</Show>
+        <Show Dialog="CalcofiProgresoDlg" Sequence="1299"/>
+        <Show Dialog="CalcofiFinDlg" OnExit="success"/>
+      </AdminUISequence>
+    </UI>
+
+    <UIRef Id="WixUI_Common"/>
+  </Fragment>
+</Wix>

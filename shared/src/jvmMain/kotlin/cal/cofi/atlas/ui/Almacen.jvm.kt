@@ -10,7 +10,9 @@ import java.util.Locale
 actual object AlmacenamientoPlataforma {
     // Home del usuario, no "junto al ejecutable": donde corre desde el IDE
     // o desde un jar empaquetado, la ruta del ejecutable no es confiable,
-    // y el home siempre existe y es escribible.
+    // y el home siempre existe y es escribible. Conserva el nombre de antes
+    // de que la app se llamara CalcofiLarvae: cambiarlo dejaria el
+    // historial guardado atras.
     private val directorio: File by lazy {
         File(System.getProperty("user.home"), ".calcofilarvas").apply { mkdirs() }
     }
