@@ -39,9 +39,11 @@ data class CapturaState(
 
 /**
  * Primera pantalla del flujo: no identifica nada, solo fija que datos son
- * comparables (talla + etapa de desarrollo). La etapa se elige viendo la
- * forma de la cola, no leyendo una palabra tecnica que el tecnico no
- * necesariamente conoce.
+ * comparables (talla + etapa de desarrollo). Cada etapa lleva su nombre del
+ * atlas (preflexion, flexion, postflexion) junto al dibujo de la notocorda.
+ *
+ * La talla es BL, como en el atlas: longitud notocordal en preflexion y
+ * flexion, longitud estandar en postflexion. No es longitud total.
  *
  * Mes y zona de colecta son opcionales y no cambian la identificacion: solo
  * alimentan el riesgo de error por temporada y distribucion del resultado.
@@ -80,10 +82,10 @@ fun PantallaCaptura(
     val listaFamilias = if (familiasCargadas.size <= 5) " (${familiasCargadas.joinToString(", ")})" else ""
 
     ContenedorPantalla(modifier) {
-        TituloPantalla("Captura")
+        TituloPantalla("Specimen")
         Text(
-            "Esta versión identifica ${data.species.size} especie(s) de " +
-                "${familiasCargadas.size} familia(s)$listaFamilias.",
+            "This version identifies ${conteo(data.species.size, "species", "species")} from " +
+                "${conteo(familiasCargadas.size, "family", "families")}$listaFamilias.",
             fontSize = dimensiones.tamanoTextoBase,
             fontStyle = FontStyle.Italic,
         )
@@ -95,8 +97,13 @@ fun PantallaCaptura(
                 val resultado = validarTalla(texto)
                 onCambio(estado.copy(tallaMm = (resultado as? ResultadoValidacion.Valido)?.valor))
             },
-            etiqueta = "Longitud total (mm)",
+            etiqueta = "Body length, BL (mm)",
             mensajeError = explicarTalla(resultadoTalla),
+        )
+        Text(
+            "Notochord length (NL) in preflexion and flexion; standard length (SL) in postflexion.",
+            fontSize = dimensiones.tamanoTextoBase,
+            fontStyle = FontStyle.Italic,
         )
 
         SelectorEtapa(
@@ -116,26 +123,22 @@ fun PantallaCaptura(
         CampoTexto(
             valor = estado.zonaColecta,
             onValorCambia = { onCambio(estado.copy(zonaColecta = sanitizarZona(it))) },
-            etiqueta = "Zona de colecta (opcional)",
+            etiqueta = "Collection locality (optional)",
         )
 
         // Siempre clickeable: al intentar continuar con algo incompleto,
         // nombra que falta en vez de solo deshabilitarse en silencio.
         BotonPrincipal(
-            texto = "Continuar",
+            texto = "Continue",
             onClick = {
                 val faltantes = buildList {
-                    if (resultadoTalla !is ResultadoValidacion.Valido) add("la talla")
-                    if (estado.etapa == null) add("la etapa")
+                    if (resultadoTalla !is ResultadoValidacion.Valido) add("body length")
+                    if (estado.etapa == null) add("developmental stage")
                 }
                 if (faltantes.isEmpty()) {
                     onContinuar()
                 } else {
-                    mensajeFaltantes = if (faltantes.size == 1) {
-                        "Falta ${faltantes.single()}."
-                    } else {
-                        "Faltan ${faltantes.joinToString(" y ")}."
-                    }
+                    mensajeFaltantes = "Missing: ${faltantes.joinToString(" and ")}."
                 }
             },
         )
@@ -155,7 +158,7 @@ private fun sanitizarZona(entrada: String): String =
 // ------------------------------------------------------- selector de mes
 
 /**
- * Doce botones y "No lo sé". Tocar el mes ya elegido lo quita: un mes
+ * Doce botones y "Unknown". Tocar el mes ya elegido lo quita: un mes
  * puesto por error tiene que poder volver a "sin dato" sin adivinar otro.
  */
 @Composable
@@ -167,7 +170,7 @@ private fun SelectorMes(
 ) {
     val porFila = if (ancho == Ancho.COMPACTO) 4 else 6
     Column(verticalArrangement = Arrangement.spacedBy(dimensiones.espaciado / 2)) {
-        Text("Mes de colecta (opcional)", fontSize = dimensiones.tamanoTextoBase)
+        Text("Collection month (optional)", fontSize = dimensiones.tamanoTextoBase)
         for (fila in (1..12).chunked(porFila)) {
             Row(horizontalArrangement = Arrangement.spacedBy(dimensiones.espaciado / 2)) {
                 for (m in fila) {
@@ -181,7 +184,7 @@ private fun SelectorMes(
             }
         }
         BotonSeleccionable(
-            texto = "No lo sé",
+            texto = "Unknown",
             seleccionado = mes == null,
             onClick = { onSeleccion(null) },
             modifier = Modifier.fillMaxWidth(),
@@ -191,16 +194,19 @@ private fun SelectorMes(
 
 // ------------------------------------------------------- selector de etapa
 
+/** [descripcion] es el criterio que define la etapa; va debajo del nombre. */
 private data class OpcionEtapa(
     val etapa: Stage,
     val descripcion: String,
     val dibujo: @Composable (Color, Modifier) -> Unit,
-)
+) {
+    val texto: String get() = "${nombreEtapa(etapa)}\n$descripcion"
+}
 
 private val opcionesEtapa = listOf(
-    OpcionEtapa(Stage.PRF, "cola recta") { color, mod -> DibujoColaRecta(color, mod) },
-    OpcionEtapa(Stage.F, "cola doblandose") { color, mod -> DibujoColaDoblandose(color, mod) },
-    OpcionEtapa(Stage.POF, "cola doblada arriba") { color, mod -> DibujoColaDobladaArriba(color, mod) },
+    OpcionEtapa(Stage.PRF, "notochord straight") { color, mod -> DibujoColaRecta(color, mod) },
+    OpcionEtapa(Stage.F, "notochord tip flexing") { color, mod -> DibujoColaDoblandose(color, mod) },
+    OpcionEtapa(Stage.POF, "flexion complete") { color, mod -> DibujoColaDobladaArriba(color, mod) },
 )
 
 @Composable
@@ -210,11 +216,12 @@ private fun SelectorEtapa(
     ancho: Ancho,
     dimensiones: Dimensiones,
 ) {
+    Text("Developmental stage", fontSize = dimensiones.tamanoTextoBase)
     if (ancho == Ancho.COMPACTO) {
         Column(verticalArrangement = Arrangement.spacedBy(dimensiones.espaciado)) {
             for (opcion in opcionesEtapa) {
                 TarjetaIlustrada(
-                    texto = opcion.descripcion,
+                    texto = opcion.texto,
                     seleccionada = etapa == opcion.etapa,
                     onClick = { onSeleccion(opcion.etapa) },
                     dibujo = opcion.dibujo,
@@ -226,7 +233,7 @@ private fun SelectorEtapa(
         Row(horizontalArrangement = Arrangement.spacedBy(dimensiones.espaciado)) {
             for (opcion in opcionesEtapa) {
                 TarjetaIlustrada(
-                    texto = opcion.descripcion,
+                    texto = opcion.texto,
                     seleccionada = etapa == opcion.etapa,
                     onClick = { onSeleccion(opcion.etapa) },
                     dibujo = opcion.dibujo,

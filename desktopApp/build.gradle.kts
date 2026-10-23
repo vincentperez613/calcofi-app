@@ -22,7 +22,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "cal.cofi.atlas"
-            packageVersion = "1.0.1"
+            packageVersion = "1.1.0"
 
             windows {
                 shortcut = true // acceso directo en el escritorio

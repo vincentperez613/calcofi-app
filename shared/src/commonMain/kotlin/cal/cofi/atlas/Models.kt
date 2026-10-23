@@ -174,7 +174,7 @@ data class FigureRef(
      * Usar el nombre de la ficha en su lugar prometeria precision que el
      * dibujo no respalda.
      */
-    fun displayLabel(): String = captionTaxon ?: species ?: "sin identificar"
+    fun displayLabel(): String = captionTaxon ?: species ?: "unidentified"
 }
 
 class AtlasData(

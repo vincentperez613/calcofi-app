@@ -91,23 +91,23 @@ fun PantallaResultado(
 
     if (vaciaPorFiltro) {
         ContenedorPantalla(modifier) {
-            TituloPantalla("Sin resultado con este filtro")
+            TituloPantalla("No result with this filter")
             val familiasFiltro = familyFilter.sorted().joinToString(", ")
             val familiasCargadas = remember(data) { data.species.map { it.family }.toSet().sorted() }
             // Los nombres de las cargadas solo si son pocas: con el atlas
             // completo son ~100 y la lista taparia el mensaje.
             val cargadas = if (familiasCargadas.size <= 5) {
-                "solo ${familiasCargadas.joinToString(", ")}, ${data.species.size} especies"
+                "only ${familiasCargadas.joinToString(", ")}, ${conteo(data.species.size, "species", "species")}"
             } else {
-                "${familiasCargadas.size} familias, ${data.species.size} especies"
+                "${conteo(familiasCargadas.size, "family", "families")}, ${conteo(data.species.size, "species", "species")}"
             }
             Text(
-                "El filtro por conteos dejó estas familias: $familiasFiltro. Ninguna tiene " +
-                    "especies cargadas en esta versión ($cargadas).",
+                "The meristic family filter left these families: $familiasFiltro. None of them " +
+                    "has species loaded in this version ($cargadas).",
                 fontSize = dimensiones.tamanoTextoBase,
             )
             BotonPrincipal(
-                texto = "Reintentar sin el filtro de familia",
+                texto = "Retry without the family filter",
                 habilitado = !reintentando,
                 onClick = {
                     reintentando = true
@@ -128,9 +128,9 @@ fun PantallaResultado(
                 },
             )
             if (reintentando) {
-                Text("Recalculando sin el filtro...", fontSize = dimensiones.tamanoTextoBase)
+                Text("Recalculating without the filter...", fontSize = dimensiones.tamanoTextoBase)
             }
-            BotonPrincipal(texto = "Nueva captura", onClick = onNuevaCaptura)
+            BotonPrincipal(texto = "New specimen", onClick = onNuevaCaptura)
         }
         return
     }
@@ -175,7 +175,7 @@ fun PantallaResultado(
             panelCandidatos()
         }
 
-        BotonPrincipal(texto = "Nueva captura", onClick = onNuevaCaptura)
+        BotonPrincipal(texto = "New specimen", onClick = onNuevaCaptura)
     }
 }
 
@@ -187,9 +187,9 @@ private fun Titular(id: Identification, dimensiones: Dimensiones) {
         TituloPantalla(id.label)
         val nota = when (id.level) {
             TaxonLevel.SPECIES -> null
-            TaxonLevel.GENUS -> "Con estos datos solo se puede llegar al género."
-            TaxonLevel.FAMILY -> "Con estos datos solo se puede llegar a la familia."
-            TaxonLevel.UNRESOLVED -> "Ningún candidato se distingue de los demás con lo respondido."
+            TaxonLevel.GENUS -> "The characters recorded only resolve to genus."
+            TaxonLevel.FAMILY -> "The characters recorded only resolve to family."
+            TaxonLevel.UNRESOLVED -> "No candidate is separated from the others by the characters recorded."
         }
         if (nota != null) {
             Text(nota, fontSize = dimensiones.tamanoTextoBase, fontStyle = FontStyle.Italic)
@@ -209,7 +209,7 @@ private fun PanelCandidatosResultado(
     dimensiones: Dimensiones,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(dimensiones.espaciado)) {
-        Text("Candidatos", fontSize = dimensiones.tamanoTextoTitulo, fontWeight = FontWeight.Bold)
+        Text("Candidates", fontSize = dimensiones.tamanoTextoTitulo, fontWeight = FontWeight.Bold)
         for (c in top3) {
             TarjetaCandidatoResultado(c, dimensiones)
             SeccionRiesgo(
@@ -254,12 +254,12 @@ private fun SeccionRiesgo(
         }
 
         lh?.spawningSeason?.let {
-            Text("Temporada según el atlas: «$it»", fontSize = dimensiones.tamanoTextoBase, fontStyle = FontStyle.Italic)
+            Text("Spawning season (atlas): “$it”", fontSize = dimensiones.tamanoTextoBase, fontStyle = FontStyle.Italic)
         }
         if (lh != null && lh.spawningMonths.isNotEmpty()) {
-            val pico = if (lh.spawningPeak.isNotEmpty()) "; pico: ${describirMeses(lh.spawningPeak)}" else ""
+            val pico = if (lh.spawningPeak.isNotEmpty()) "; peak: ${describirMeses(lh.spawningPeak)}" else ""
             Text(
-                "Meses leídos automáticamente de ese texto, sin revisar: ${describirMeses(lh.spawningMonths)}$pico.",
+                "Months parsed automatically from that text, not reviewed: ${describirMeses(lh.spawningMonths)}$pico.",
                 fontSize = dimensiones.tamanoTextoBase,
                 fontStyle = FontStyle.Italic,
             )
@@ -267,14 +267,14 @@ private fun SeccionRiesgo(
 
         val rango = lh?.range
         if (rango != null) {
-            Text("Distribución según el atlas: «$rango»", fontSize = dimensiones.tamanoTextoBase, fontStyle = FontStyle.Italic)
+            Text("Geographic range (atlas): “$rango”", fontSize = dimensiones.tamanoTextoBase, fontStyle = FontStyle.Italic)
             val zona = zonaColecta?.let { " ($it)" } ?: ""
-            Text("¿Tu zona de colecta$zona cae dentro?", fontSize = dimensiones.tamanoTextoBase)
+            Text("Is your collection locality$zona within this range?", fontSize = dimensiones.tamanoTextoBase)
             Row(horizontalArrangement = Arrangement.spacedBy(dimensiones.espaciado / 2)) {
                 for ((valor, texto) in listOf(
-                    Distribucion.SI to "Sí",
+                    Distribucion.SI to "Yes",
                     Distribucion.NO to "No",
-                    Distribucion.NO_SE to "No sé",
+                    Distribucion.NO_SE to "Unknown",
                 )) {
                     BotonSeleccionable(
                         texto = texto,
@@ -289,10 +289,10 @@ private fun SeccionRiesgo(
 }
 
 private fun textoNivel(nivel: NivelRiesgo): String = when (nivel) {
-    NivelRiesgo.BAJO -> "Riesgo de error: bajo"
-    NivelRiesgo.MEDIO -> "Riesgo de error: medio"
-    NivelRiesgo.ALTO -> "Riesgo de error: alto"
-    NivelRiesgo.NO_EVALUABLE -> "Riesgo de error: no evaluable"
+    NivelRiesgo.BAJO -> "Misidentification risk: low"
+    NivelRiesgo.MEDIO -> "Misidentification risk: medium"
+    NivelRiesgo.ALTO -> "Misidentification risk: high"
+    NivelRiesgo.NO_EVALUABLE -> "Misidentification risk: not assessable"
 }
 
 @Composable
@@ -305,18 +305,18 @@ private fun TarjetaCandidatoResultado(c: Candidate, dimensiones: Dimensiones) {
         )
         if (c.supporting.isNotEmpty()) {
             Text(
-                "A favor: " + c.supporting.joinToString("; ") { traducirCaracter(it) },
+                "Supporting: " + c.supporting.joinToString("; ") { traducirCaracter(it) },
                 fontSize = dimensiones.tamanoTextoBase,
             )
         }
         if (c.contradicting.isNotEmpty()) {
             Text(
-                "En contra: " + c.contradicting.joinToString("; ") { traducirCaracter(it) },
+                "Conflicting: " + c.contradicting.joinToString("; ") { traducirCaracter(it) },
                 fontSize = dimensiones.tamanoTextoBase,
             )
         }
         if (c.supporting.isEmpty() && c.contradicting.isEmpty()) {
-            Text("Sin evidencia evaluada todavía.", fontSize = dimensiones.tamanoTextoBase)
+            Text("No characters evaluated yet.", fontSize = dimensiones.tamanoTextoBase)
         }
     }
 }
@@ -327,7 +327,7 @@ private fun TarjetaCandidatoResultado(c: Candidate, dimensiones: Dimensiones) {
 private fun PanelFigura(data: AtlasData, especie: Species, stage: Stage, dimensiones: Dimensiones) {
     val figura = remember(especie, stage) { data.figuresFor(especie, stage).firstOrNull() }
     if (figura == null) {
-        Text("No hay figura disponible para esta etapa.", fontSize = dimensiones.tamanoTextoBase)
+        Text("No figure available for this stage.", fontSize = dimensiones.tamanoTextoBase)
         return
     }
     TarjetaFigura(figura, dimensiones)
@@ -356,15 +356,15 @@ fun TarjetaFigura(figura: FigureRef, dimensiones: Dimensiones) {
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            EstadoImagen.Error(e.message ?: "error desconocido")
+            EstadoImagen.Error(e.message ?: "unknown error")
         }
     }
 
     Column(verticalArrangement = Arrangement.spacedBy(dimensiones.espaciado / 2)) {
         when (val actual = estado) {
-            is EstadoImagen.Cargando -> Text("Cargando figura...", fontSize = dimensiones.tamanoTextoBase)
+            is EstadoImagen.Cargando -> Text("Loading figure...", fontSize = dimensiones.tamanoTextoBase)
             is EstadoImagen.Error ->
-                Text("No se pudo cargar la figura: ${actual.mensaje}", fontSize = dimensiones.tamanoTextoBase)
+                Text("Could not load figure: ${actual.mensaje}", fontSize = dimensiones.tamanoTextoBase)
             is EstadoImagen.Listo -> RecorteFigura(actual.bitmap, figura, dimensiones)
         }
 
@@ -375,10 +375,10 @@ fun TarjetaFigura(figura: FigureRef, dimensiones: Dimensiones) {
         Text(figura.displayLabel(), fontSize = dimensiones.tamanoTextoBase, fontWeight = FontWeight.Bold)
 
         if (figura.stageSource != "caption") {
-            Text("Etapa inferida de la talla, no del pie de figura.", fontSize = dimensiones.tamanoTextoBase, fontStyle = FontStyle.Italic)
+            Text("Stage inferred from body length, not from the figure caption.", fontSize = dimensiones.tamanoTextoBase, fontStyle = FontStyle.Italic)
         }
         if (figura.uncertain) {
-            Text("Identificación incierta según el atlas.", fontSize = dimensiones.tamanoTextoBase, fontStyle = FontStyle.Italic)
+            Text("Identification marked as uncertain in the atlas.", fontSize = dimensiones.tamanoTextoBase, fontStyle = FontStyle.Italic)
         }
     }
 }
@@ -427,8 +427,8 @@ private fun RecorteFigura(bitmap: ImageBitmap, figura: FigureRef, dimensiones: D
         }
         if (!dentroDeLimites) {
             Text(
-                "ADVERTENCIA (datos): el recorte [${box.joinToString(",")}] cae fuera de la " +
-                    "lamina (${bitmap.width}×${bitmap.height} px). Mostrando la página completa.",
+                "DATA WARNING: crop box [${box.joinToString(",")}] falls outside the " +
+                    "plate (${bitmap.width}×${bitmap.height} px). Showing the full plate.",
                 fontSize = dimensiones.tamanoTextoBase,
                 color = MaterialTheme.colorScheme.error,
             )

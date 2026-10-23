@@ -142,18 +142,19 @@ fun PantallaEspecies(data: AtlasData, activa: Boolean, modifier: Modifier = Modi
                 modifier = Modifier.padding(dimensiones.espaciado),
                 verticalArrangement = Arrangement.spacedBy(dimensiones.espaciado),
             ) {
-                TituloPantalla("Especies")
+                TituloPantalla("Species")
                 Text(
-                    "${data.species.size} especies en ${familiasOrdenadas.size} familias",
+                    "${conteo(data.species.size, "species", "species")} in " +
+                        conteo(familiasOrdenadas.size, "family", "families"),
                     fontSize = dimensiones.tamanoTextoBase,
                 )
                 CampoTexto(
                     valor = texto,
                     onValorCambia = { texto = sanitizarBusqueda(it) },
-                    etiqueta = "Buscar especie, género o familia",
+                    etiqueta = "Search species, genus or family",
                 )
                 if (texto.isNotEmpty()) {
-                    BotonSecundario(texto = "Limpiar búsqueda", onClick = { texto = "" })
+                    BotonSecundario(texto = "Clear search", onClick = { texto = "" })
                 }
             }
 
@@ -162,8 +163,8 @@ fun PantallaEspecies(data: AtlasData, activa: Boolean, modifier: Modifier = Modi
                     modifier = Modifier.padding(horizontal = dimensiones.espaciado),
                     verticalArrangement = Arrangement.spacedBy(dimensiones.espaciado),
                 ) {
-                    Text("Sin resultados para «$consultaAplicada».", fontSize = dimensiones.tamanoTextoBase)
-                    BotonSecundario(texto = "Limpiar búsqueda", onClick = { texto = "" })
+                    Text("No results for “$consultaAplicada”.", fontSize = dimensiones.tamanoTextoBase)
+                    BotonSecundario(texto = "Clear search", onClick = { texto = "" })
                 }
             } else {
                 LazyColumn(
@@ -278,12 +279,12 @@ private fun FilaEspecie(especie: Species, dimensiones: Dimensiones, onClick: () 
 @Composable
 private fun DetalleEspecie(data: AtlasData, especie: Species, dimensiones: Dimensiones, onVolver: () -> Unit) {
     TituloPantalla(especie.species)
-    Text("Familia: ${especie.family}", fontSize = dimensiones.tamanoTextoBase)
-    Text("Página del atlas: ${especie.pdfPage}", fontSize = dimensiones.tamanoTextoBase)
+    Text("Family: ${especie.family}", fontSize = dimensiones.tamanoTextoBase)
+    Text("Atlas page: ${especie.pdfPage}", fontSize = dimensiones.tamanoTextoBase)
 
     if (especie.meristics.isNotEmpty()) {
         Column(verticalArrangement = Arrangement.spacedBy(dimensiones.espaciado / 4)) {
-            Text("Rangos merísticos", fontSize = dimensiones.tamanoTextoTitulo, fontWeight = FontWeight.Bold)
+            Text("Meristics", fontSize = dimensiones.tamanoTextoTitulo, fontWeight = FontWeight.Bold)
             for ((caracter, rango) in especie.meristics.toSortedMap()) {
                 Text("${traducirCaracter(caracter)}: ${formatearRango(rango)}", fontSize = dimensiones.tamanoTextoBase)
             }
@@ -296,19 +297,19 @@ private fun DetalleEspecie(data: AtlasData, especie: Species, dimensiones: Dimen
     val figuras = remember(especie) { data.figures.filter { it.species == especie.species } }
     if (figuras.isNotEmpty()) {
         Column(verticalArrangement = Arrangement.spacedBy(dimensiones.espaciado)) {
-            Text("Figuras", fontSize = dimensiones.tamanoTextoTitulo, fontWeight = FontWeight.Bold)
+            Text("Figures", fontSize = dimensiones.tamanoTextoTitulo, fontWeight = FontWeight.Bold)
             for (figura in figuras) {
                 TarjetaFigura(figura, dimensiones)
             }
         }
     }
 
-    BotonPrincipal(texto = "Volver al catálogo", onClick = onVolver)
+    BotonPrincipal(texto = "Back to catalog", onClick = onVolver)
 }
 
 /**
  * Temporada de desove, distribucion y habitat: el texto del atlas tal cual
- * (en ingles, con algun error de OCR), mas los meses leidos de ese texto
+ * (con algun error de OCR), mas los meses leidos de ese texto
  * marcados como lectura automatica sin revisar. Es lo mismo que el
  * resultado usa para el riesgo de error, para que el tecnico pueda
  * consultarlo antes y discrepar con conocimiento.
@@ -316,27 +317,27 @@ private fun DetalleEspecie(data: AtlasData, especie: Species, dimensiones: Dimen
 @Composable
 private fun SeccionHistoriaDeVida(lh: LifeHistory?, dimensiones: Dimensiones) {
     Column(verticalArrangement = Arrangement.spacedBy(dimensiones.espaciado / 4)) {
-        Text("Temporada y distribución", fontSize = dimensiones.tamanoTextoTitulo, fontWeight = FontWeight.Bold)
+        Text("Life history", fontSize = dimensiones.tamanoTextoTitulo, fontWeight = FontWeight.Bold)
         if (lh == null) {
-            Text("El atlas no trae esta información para la especie.", fontSize = dimensiones.tamanoTextoBase)
+            Text("The atlas gives no life-history information for this species.", fontSize = dimensiones.tamanoTextoBase)
             return@Column
         }
         Text(
-            "Texto del atlas, en inglés y sin corregir.",
+            "Verbatim atlas text; OCR errors not corrected.",
             fontSize = dimensiones.tamanoTextoBase,
             fontStyle = FontStyle.Italic,
         )
-        lh.spawningSeason?.let { Text("Desove: «$it»", fontSize = dimensiones.tamanoTextoBase) }
+        lh.spawningSeason?.let { Text("Spawning: “$it”", fontSize = dimensiones.tamanoTextoBase) }
         if (lh.spawningMonths.isNotEmpty()) {
-            val pico = if (lh.spawningPeak.isNotEmpty()) "; pico: ${describirMeses(lh.spawningPeak)}" else ""
+            val pico = if (lh.spawningPeak.isNotEmpty()) "; peak: ${describirMeses(lh.spawningPeak)}" else ""
             Text(
-                "Meses leídos automáticamente, sin revisar: ${describirMeses(lh.spawningMonths)}$pico.",
+                "Months parsed automatically, not reviewed: ${describirMeses(lh.spawningMonths)}$pico.",
                 fontSize = dimensiones.tamanoTextoBase,
                 fontStyle = FontStyle.Italic,
             )
         }
-        lh.range?.let { Text("Distribución: «$it»", fontSize = dimensiones.tamanoTextoBase) }
-        lh.habitat?.let { Text("Hábitat: «$it»", fontSize = dimensiones.tamanoTextoBase) }
+        lh.range?.let { Text("Range: “$it”", fontSize = dimensiones.tamanoTextoBase) }
+        lh.habitat?.let { Text("Habitat: “$it”", fontSize = dimensiones.tamanoTextoBase) }
     }
 }
 
@@ -344,7 +345,7 @@ private fun SeccionHistoriaDeVida(lh: LifeHistory?, dimensiones: Dimensiones) {
 private fun ListaDiagnosticos(diagnostic: Map<String, DiagnosticChar>, dimensiones: Dimensiones) {
     if (diagnostic.isEmpty()) return
     Column(verticalArrangement = Arrangement.spacedBy(dimensiones.espaciado / 4)) {
-        Text("Caracteres diagnósticos", fontSize = dimensiones.tamanoTextoTitulo, fontWeight = FontWeight.Bold)
+        Text("Diagnostic characters", fontSize = dimensiones.tamanoTextoTitulo, fontWeight = FontWeight.Bold)
         for ((caracter, d) in diagnostic.toSortedMap()) {
             val detalle = when {
                 d.value != null -> d.value

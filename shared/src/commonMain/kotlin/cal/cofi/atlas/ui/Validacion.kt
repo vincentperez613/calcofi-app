@@ -67,7 +67,7 @@ private fun formatearNumero(valor: Double): String =
     if (valor == floor(valor)) valor.toLong().toString() else valor.toString()
 
 /**
- * Mensaje en lenguaje llano para mostrar debajo del campo. [Vacio] se deja
+ * Mensaje para mostrar debajo del campo. [Vacio] se deja
  * en null a proposito: un campo que el tecnico todavia no toco no es un
  * error, es solo "todavia no" — regañarlo por eso es ruido. La falta se
  * nombra aparte, al intentar continuar, no campo por campo mientras se
@@ -75,16 +75,16 @@ private fun formatearNumero(valor: Double): String =
  */
 fun explicarTalla(resultado: ResultadoValidacion): String? = when (resultado) {
     is ResultadoValidacion.Valido, ResultadoValidacion.Vacio -> null
-    ResultadoValidacion.NoNumerico -> "Solo números."
+    ResultadoValidacion.NoNumerico -> "Numbers only."
     is ResultadoValidacion.FueraDeRango ->
-        "La talla debe estar entre ${formatearNumero(resultado.min)} y ${formatearNumero(resultado.max)} mm."
-    ResultadoValidacion.DebeSerEntero -> "Solo números." // no aplica a talla, defensivo
+        "Body length must be between ${formatearNumero(resultado.min)} and ${formatearNumero(resultado.max)} mm."
+    ResultadoValidacion.DebeSerEntero -> "Numbers only." // no aplica a talla, defensivo
 }
 
 fun explicarConteo(resultado: ResultadoValidacion): String? = when (resultado) {
     is ResultadoValidacion.Valido, ResultadoValidacion.Vacio -> null
-    ResultadoValidacion.NoNumerico -> "Solo números."
+    ResultadoValidacion.NoNumerico -> "Numbers only."
     is ResultadoValidacion.FueraDeRango ->
-        "El conteo debe estar entre ${formatearNumero(resultado.min)} y ${formatearNumero(resultado.max)}."
-    ResultadoValidacion.DebeSerEntero -> "El conteo debe ser un número entero, sin decimales."
+        "Count must be between ${formatearNumero(resultado.min)} and ${formatearNumero(resultado.max)}."
+    ResultadoValidacion.DebeSerEntero -> "Count must be a whole number."
 }

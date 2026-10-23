@@ -61,23 +61,23 @@ private fun ListaSesiones(
     dimensiones: Dimensiones,
     onSeleccion: (SesionGuardada) -> Unit,
 ) {
-    TituloPantalla("Historial")
+    TituloPantalla("History")
 
     var mensajeExportacion by remember { mutableStateOf<String?>(null) }
     BotonSecundario(
-        texto = "Exportar a CSV",
+        texto = "Export to CSV",
         onClick = {
             mensajeExportacion = try {
                 Almacen.exportarCsv()
             } catch (e: Exception) {
-                "No se pudo exportar: ${e.message}"
+                "Export failed: ${e.message}"
             }
         },
     )
     mensajeExportacion?.let { Text(it, fontSize = dimensiones.tamanoTextoBase) }
 
     if (sesiones.isEmpty()) {
-        Text("Todavía no hay sesiones guardadas.", fontSize = dimensiones.tamanoTextoBase)
+        Text("No saved sessions yet.", fontSize = dimensiones.tamanoTextoBase)
     } else {
         for (sesion in sesiones) {
             TarjetaSesion(sesion, dimensiones, onClick = { onSeleccion(sesion) })
@@ -98,29 +98,29 @@ private fun TarjetaSesion(sesion: SesionGuardada, dimensiones: Dimensiones, onCl
         verticalArrangement = Arrangement.spacedBy(dimensiones.espaciado / 4),
     ) {
         Text(
-            "${sesion.fechaHoraIso} — ${sesion.etapa}, ${sesion.tallaMm} mm",
+            "${sesion.fechaHoraIso} — ${nombreEtapaGuardada(sesion.etapa)}, BL ${sesion.tallaMm} mm",
             fontSize = dimensiones.tamanoTextoBase,
             fontWeight = FontWeight.Bold,
         )
         val resumen = sesion.resultado?.let { "${it.label} (${it.nivel})" }
-            ?: "Sin terminar — ${sesion.observaciones.size} respuesta(s)"
+            ?: "Unfinished — ${conteo(sesion.observaciones.size, "answer", "answers")}"
         Text(resumen, fontSize = dimensiones.tamanoTextoBase)
     }
 }
 
 @Composable
 private fun DetalleSesion(sesion: SesionGuardada, dimensiones: Dimensiones, onVolver: () -> Unit) {
-    TituloPantalla("Sesión ${sesion.fechaHoraIso}")
-    Text("Etapa: ${sesion.etapa} — Talla: ${sesion.tallaMm} mm", fontSize = dimensiones.tamanoTextoBase)
+    TituloPantalla("Session ${sesion.fechaHoraIso}")
+    Text("Stage: ${nombreEtapaGuardada(sesion.etapa)} — BL: ${sesion.tallaMm} mm", fontSize = dimensiones.tamanoTextoBase)
     Text(
-        "Mes de colecta: ${sesion.mesColecta?.let { nombreMes(it) } ?: "sin dato"} — " +
-            "Zona: ${sesion.zonaColecta ?: "sin dato"}",
+        "Collection month: ${sesion.mesColecta?.let { nombreMes(it) } ?: "not recorded"} — " +
+            "Locality: ${sesion.zonaColecta ?: "not recorded"}",
         fontSize = dimensiones.tamanoTextoBase,
     )
 
-    Text("Observaciones", fontSize = dimensiones.tamanoTextoTitulo, fontWeight = FontWeight.Bold)
+    Text("Observations", fontSize = dimensiones.tamanoTextoTitulo, fontWeight = FontWeight.Bold)
     if (sesion.observaciones.isEmpty()) {
-        Text("Ninguna respondida todavía.", fontSize = dimensiones.tamanoTextoBase)
+        Text("None recorded yet.", fontSize = dimensiones.tamanoTextoBase)
     } else {
         for (obs in sesion.observaciones) {
             val valorTexto = when {
@@ -128,17 +128,17 @@ private fun DetalleSesion(sesion: SesionGuardada, dimensiones: Dimensiones, onVo
                     "${obs.numeradorMm} / ${obs.denominadorMm} mm = ${obs.valor}%"
                 obs.valor != null -> obs.valor.toString()
                 obs.categorico != null -> obs.categorico
-                else -> "no sé"
+                else -> "unknown"
             }
             Text("${traducirCaracter(obs.character)}: $valorTexto", fontSize = dimensiones.tamanoTextoBase)
         }
     }
 
     val resultado = sesion.resultado
-    Text("Resultado", fontSize = dimensiones.tamanoTextoTitulo, fontWeight = FontWeight.Bold)
+    Text("Result", fontSize = dimensiones.tamanoTextoTitulo, fontWeight = FontWeight.Bold)
     if (resultado == null) {
         Text(
-            "Sesión sin resultado — se abandonó antes de terminar el interrogatorio.",
+            "No result — the session was abandoned before the identification was finished.",
             fontSize = dimensiones.tamanoTextoBase,
             fontStyle = FontStyle.Italic,
         )
@@ -153,7 +153,7 @@ private fun DetalleSesion(sesion: SesionGuardada, dimensiones: Dimensiones, onVo
             candidato.riesgo?.let { riesgo ->
                 val nivel = runCatching { NivelRiesgo.valueOf(riesgo) }.getOrNull()
                 Text(
-                    "Riesgo de error: ${nivel?.let(::nombreNivel) ?: riesgo}",
+                    "Misidentification risk: ${nivel?.let(::nombreNivel) ?: riesgo}",
                     fontSize = dimensiones.tamanoTextoBase,
                     fontStyle = FontStyle.Italic,
                 )
@@ -164,12 +164,12 @@ private fun DetalleSesion(sesion: SesionGuardada, dimensiones: Dimensiones, onVo
         }
     }
 
-    BotonPrincipal(texto = "Volver a la lista", onClick = onVolver)
+    BotonPrincipal(texto = "Back to list", onClick = onVolver)
 }
 
 private fun nombreNivel(nivel: NivelRiesgo): String = when (nivel) {
-    NivelRiesgo.BAJO -> "bajo"
-    NivelRiesgo.MEDIO -> "medio"
-    NivelRiesgo.ALTO -> "alto"
-    NivelRiesgo.NO_EVALUABLE -> "no evaluable"
+    NivelRiesgo.BAJO -> "low"
+    NivelRiesgo.MEDIO -> "medium"
+    NivelRiesgo.ALTO -> "high"
+    NivelRiesgo.NO_EVALUABLE -> "not assessable"
 }

@@ -285,7 +285,7 @@ fun BotonSeleccionable(
 /**
  * Tarjeta de opcion con dibujo arriba y texto abajo: la de las etapas de
  * PantallaCaptura y la de las preguntas de opciones (p.ej. forma del
- * cuerpo). El tecnico elige viendo el dibujo, no leyendo un termino.
+ * cuerpo). El dibujo acompaña al termino para confirmar la eleccion.
  * [dibujo] recibe el color a usar (resaltado si esta seleccionada) y el
  * tamaño que le toca.
  */

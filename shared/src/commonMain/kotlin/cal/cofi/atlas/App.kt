@@ -78,8 +78,8 @@ fun App() {
             LaunchedEffect(repositorio) { repositorio.cargar() }
 
             when (val estado = estadoCarga) {
-                is EstadoCarga.Cargando -> MensajeCentrado("Cargando atlas...")
-                is EstadoCarga.Error -> MensajeCentrado("Error al cargar el atlas: ${estado.mensaje}")
+                is EstadoCarga.Cargando -> MensajeCentrado("Loading atlas...")
+                is EstadoCarga.Error -> MensajeCentrado("Failed to load the atlas: ${estado.mensaje}")
                 is EstadoCarga.Listo -> AppConNavegacion(estado.data)
             }
         }
@@ -142,19 +142,19 @@ private fun BarraInferior(seccion: Seccion, onSeccion: (Seccion) -> Unit) {
             selected = seccion == Seccion.ANALISIS,
             onClick = { onSeccion(Seccion.ANALISIS) },
             icon = { IconoAnalisis() },
-            label = { Text("Análisis") },
+            label = { Text("Identify") },
         )
         NavigationBarItem(
             selected = seccion == Seccion.ESPECIES,
             onClick = { onSeccion(Seccion.ESPECIES) },
             icon = { IconoEspecies() },
-            label = { Text("Especies") },
+            label = { Text("Species") },
         )
         NavigationBarItem(
             selected = seccion == Seccion.HISTORIAL,
             onClick = { onSeccion(Seccion.HISTORIAL) },
             icon = { IconoHistorial() },
-            label = { Text("Historial") },
+            label = { Text("History") },
         )
     }
 }
@@ -166,19 +166,19 @@ private fun BarraLateral(seccion: Seccion, onSeccion: (Seccion) -> Unit) {
             selected = seccion == Seccion.ANALISIS,
             onClick = { onSeccion(Seccion.ANALISIS) },
             icon = { IconoAnalisis() },
-            label = { Text("Análisis") },
+            label = { Text("Identify") },
         )
         NavigationRailItem(
             selected = seccion == Seccion.ESPECIES,
             onClick = { onSeccion(Seccion.ESPECIES) },
             icon = { IconoEspecies() },
-            label = { Text("Especies") },
+            label = { Text("Species") },
         )
         NavigationRailItem(
             selected = seccion == Seccion.HISTORIAL,
             onClick = { onSeccion(Seccion.HISTORIAL) },
             icon = { IconoHistorial() },
-            label = { Text("Historial") },
+            label = { Text("History") },
         )
     }
 }

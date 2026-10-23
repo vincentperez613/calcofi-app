@@ -99,8 +99,8 @@ class NivelDeRiesgoTest {
         val lh = LifeHistory(range = "Morro Bay to Bahia Magdalena", spawningSeason = "Summer", spawningMonths = listOf(6, 7, 8))
         val e = evaluarRiesgo(1, lh, Distribucion.NO_SE)
         assertEquals(NivelRiesgo.ALTO, e.nivel)
-        assertTrue(e.razones.any { "enero" in it && "fuera" in it }, "razones: ${e.razones}")
-        assertTrue(e.razones.any { "junio, julio, agosto" in it }, "razones: ${e.razones}")
+        assertTrue(e.razones.any { "January" in it && "outside" in it }, "razones: ${e.razones}")
+        assertTrue(e.razones.any { "June, July, August" in it }, "razones: ${e.razones}")
     }
 
     @Test
@@ -108,7 +108,7 @@ class NivelDeRiesgoTest {
         val lh = LifeHistory(range = "Oregon to Baja", spawningMonths = (1..12).toList())
         val e = evaluarRiesgo(3, lh, Distribucion.NO_SE)
         assertEquals(NivelRiesgo.NO_EVALUABLE, e.nivel)
-        assertTrue(e.razones.any { "hacen falta las dos" in it }, "razones: ${e.razones}")
+        assertTrue(e.razones.any { "requires both" in it }, "razones: ${e.razones}")
     }
 
     @Test

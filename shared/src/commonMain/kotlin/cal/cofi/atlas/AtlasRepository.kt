@@ -100,7 +100,7 @@ class AtlasRepository(
                 } catch (e: CancellationException) {
                     throw e
                 } catch (e: Exception) {
-                    EstadoCarga.Error(e.message ?: "error al cargar el atlas").also { _estado.value = it }
+                    EstadoCarga.Error(e.message ?: "failed to load the atlas").also { _estado.value = it }
                 }
             }
         }

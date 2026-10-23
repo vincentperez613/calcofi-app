@@ -36,10 +36,10 @@ class CoberturaCaracteresTest {
     @Test
     fun todoLoPreguntableTieneRedaccionYClase() {
         // Lo contrario del reporte: nada de lo que el interrogatorio puede
-        // ofrecer se queda sin forma llana de pedirse ni sin etapa.
+        // ofrecer se queda sin redaccion ni sin etapa.
         for (clave in PREGUNTABLES) {
             assertTrue(clave in cal.cofi.atlas.CHARACTER_CLASS, "'$clave' es preguntable pero no tiene clase")
-            assertTrue(traducirCaracter(clave) != clave, "'$clave' es preguntable pero se mostraria crudo")
+            assertTrue(tieneEtiqueta(clave), "'$clave' es preguntable pero no tiene nombre corto")
         }
     }
 }
