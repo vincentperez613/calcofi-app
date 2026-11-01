@@ -374,11 +374,20 @@ fun TarjetaFigura(figura: FigureRef, dimensiones: Dimensiones) {
         // precision que el dibujo no respalda.
         Text(figura.displayLabel(), fontSize = dimensiones.tamanoTextoBase, fontWeight = FontWeight.Bold)
 
-        if (figura.stageSource != "caption") {
+        (figura.sizeLabel ?: figura.sizeMm?.let { "$it mm" })?.let {
+            Text("Talla: $it", fontSize = dimensiones.tamanoTextoBase)
+        }
+        figura.stage?.let {
+            Text("Etapa: ${it.code}", fontSize = dimensiones.tamanoTextoBase)
+        }
+        if (figura.stage != null && figura.stageSource != null && figura.stageSource != "caption") {
             Text("Etapa inferida de la talla, no del pie de figura.", fontSize = dimensiones.tamanoTextoBase, fontStyle = FontStyle.Italic)
         }
         if (figura.uncertain) {
             Text("Identificación incierta según el atlas.", fontSize = dimensiones.tamanoTextoBase, fontStyle = FontStyle.Italic)
+        }
+        if (figura.needsReview) {
+            Text("Figura pendiente de revisión.", fontSize = dimensiones.tamanoTextoBase, fontStyle = FontStyle.Italic)
         }
     }
 }

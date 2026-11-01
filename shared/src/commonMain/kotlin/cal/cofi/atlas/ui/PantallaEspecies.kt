@@ -37,8 +37,6 @@ internal fun ColumnScope.DetalleEspecie(
     data: AtlasData,
     especie: Species,
     dimensiones: Dimensiones,
-    imagen: String? = null,
-    carpetaImagen: String = "fullres",
     textoVolverArriba: String = "Volver al catálogo",
     onVolver: () -> Unit,
 ) {
@@ -59,15 +57,6 @@ internal fun ColumnScope.DetalleEspecie(
             }
         }
         TituloPantalla(especie.species)
-    }
-    if (imagen != null) {
-        ImagenEspecie(
-            archivo = imagen,
-            descripcion = especie.species,
-            carpetaImagen = carpetaImagen,
-            modifier = Modifier.fillMaxWidth(),
-            altura = null,
-        )
     }
     Column(
         modifier = Modifier

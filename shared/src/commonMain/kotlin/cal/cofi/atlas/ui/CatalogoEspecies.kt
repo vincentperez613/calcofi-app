@@ -13,10 +13,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -32,9 +31,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import cal.cofi.atlas.AtlasData
@@ -51,24 +52,47 @@ import kotlinx.serialization.json.Json
 import org.jetbrains.compose.resources.decodeToImageBitmap
 
 @Serializable
-private data class EntradaImagenEspecie(
-    val id: String,
+private data class EntradaImagenFamilia(
+    val family: String,
     val file: String,
 )
 
 private val jsonIndiceImagenes = Json { ignoreUnknownKeys = true }
+// El JSON de especies conserva errores OCR que no coinciden con el índice de imágenes.
+private val familiasEquivalentes = mapOf(
+    "Bath~Asteridae" to "Bathymasteridae",
+    "Blennhdae" to "Blenniidae",
+    "Blennudae" to "Blenniidae",
+    "Botiddae" to "Bothidae",
+    "Hemlramphidae" to "Hemiraphidae",
+    "Lopididae" to "Lophiidae",
+    "Mlrapinnidae" to "Mirapinnidae",
+    "Myctopiddae" to "Myctophidae",
+    "Notacantiddae" to "Notacanthidae",
+    "Opidchthidae" to "Ophichthidae",
+    "Opiddiidae" to "Ophidiidae",
+    "P Aralichthyidae" to "Paralichthyidae",
+    "Pa Ralepididae" to "Paralepididae",
+    "Raditcephalidae" to "Radiicephalidae",
+    "Sclaenidae" to "Sciaenidae",
+    "Scorp Aenidae" to "Scorpaenidae",
+    "Scorpa Enidae" to "Scorpaenidae",
+    "Sternoptychidae" to "Stemoptychidae",
+    "Sternoptyciddae" to "Stemoptychidae",
+    "Tracidpteridae" to "Trachipteridae",
+)
 
 @Composable
 internal fun CatalogoEspecies(data: AtlasData, modifier: Modifier = Modifier) {
     val dimensiones = LocalDimensiones.current
+    val ancho = LocalAncho.current
     val familias = remember(data) {
         data.species.groupBy { it.family }
             .toSortedMap()
             .mapValues { (_, especies) -> especies.sortedBy { it.species } }
     }
     val indiceBusqueda = remember(data) { construirIndiceImagenes(data) }
-    var miniaturas by remember(data) { mutableStateOf<Map<String, String>?>(null) }
-    var imagenesFullres by remember(data) { mutableStateOf<Map<String, String>?>(null) }
+    var imagenesFamilias by remember(data) { mutableStateOf<Map<String, String>?>(null) }
     var errorCarga by remember(data) { mutableStateOf<String?>(null) }
     var especieSeleccionadaId by rememberSaveable { mutableStateOf<String?>(null) }
     var familiasExpandidas by rememberSaveable(stateSaver = SaverFamiliasIndice) {
@@ -77,14 +101,9 @@ internal fun CatalogoEspecies(data: AtlasData, modifier: Modifier = Modifier) {
     var texto by remember { mutableStateOf("") }
     var coincidencias by remember { mutableStateOf<Set<String>?>(null) }
     var consultaAplicada by remember { mutableStateOf("") }
-    val especiesConImagen = remember(data, miniaturas) {
-        miniaturas?.let { indice -> data.species.count { it.id in indice } }
-    }
-
     LaunchedEffect(data) {
         try {
-            miniaturas = cargarIndiceImagenes("thumbnails")
-            imagenesFullres = cargarIndiceImagenes("fullres")
+            imagenesFamilias = cargarIndiceImagenesFamilias()
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
@@ -122,8 +141,6 @@ internal fun CatalogoEspecies(data: AtlasData, modifier: Modifier = Modifier) {
                 data = data,
                 especie = especieSeleccionada,
                 dimensiones = dimensiones,
-                imagen = imagenesFullres?.get(especieSeleccionada.id),
-                carpetaImagen = "fullres",
                 textoVolverArriba = "Volver al catálogo",
                 onVolver = { especieSeleccionadaId = null },
             )
@@ -158,18 +175,17 @@ internal fun CatalogoEspecies(data: AtlasData, modifier: Modifier = Modifier) {
                 Text(
                     buildString {
                         append("${data.species.size} especies en ${familias.size} familias")
-                        especiesConImagen?.let { append(" · $it con imagen") }
                     },
                     fontSize = dimensiones.tamanoTextoBase,
                 )
                 when {
                     errorCarga != null -> Text(
-                        "No se pudo cargar el índice de imágenes: $errorCarga",
+                        "No se pudo cargar el índice de imágenes de familias: $errorCarga",
                         color = MaterialTheme.colorScheme.error,
                         fontSize = dimensiones.tamanoTextoBase,
                     )
-                    miniaturas == null || imagenesFullres == null -> Text(
-                        "Cargando índice de imágenes...",
+                    imagenesFamilias == null -> Text(
+                        "Cargando imágenes de familias...",
                         fontSize = dimensiones.tamanoTextoBase,
                     )
                 }
@@ -192,21 +208,32 @@ internal fun CatalogoEspecies(data: AtlasData, modifier: Modifier = Modifier) {
                     BotonSecundario(texto = "Limpiar búsqueda", onClick = { texto = "" })
                 }
             } else {
-                LazyColumn(
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(
+                        when (ancho) {
+                            Ancho.COMPACTO -> 2
+                            Ancho.MEDIO -> 3
+                            Ancho.AMPLIO -> 4
+                        },
+                    ),
                     modifier = Modifier.weight(1f).fillMaxWidth(),
                     contentPadding = PaddingValues(
                         start = dimensiones.espaciado,
                         end = dimensiones.espaciado,
                         bottom = dimensiones.espaciado,
                     ),
+                    horizontalArrangement = Arrangement.spacedBy(dimensiones.espaciado / 2),
                     verticalArrangement = Arrangement.spacedBy(dimensiones.espaciado / 4),
                 ) {
                     for ((familia, especies) in familiasVisibles) {
                         val expandida = familia in familiasExpandidas || familia in familiasConCoincidencia
                         item(key = "familia:$familia") {
-                            FilaFamiliaIndice(
+                            TarjetaFamiliaIndice(
                                 familia = familia,
-                                total = especies.size,
+                                especies = especies,
+                                archivoImagen = imagenesFamilias?.let { indice ->
+                                    indice[familia] ?: familiasEquivalentes[familia]?.let(indice::get)
+                                },
                                 expandida = expandida,
                                 dimensiones = dimensiones,
                                 onClick = {
@@ -216,17 +243,8 @@ internal fun CatalogoEspecies(data: AtlasData, modifier: Modifier = Modifier) {
                                         familiasExpandidas + familia
                                     }
                                 },
+                                onEspecieClick = { especieSeleccionadaId = it.id },
                             )
-                        }
-                        if (expandida) {
-                            items(especies, key = { "especie:${it.id}" }) { especie ->
-                                FilaEspecieIndice(
-                                    especie = especie,
-                                    imagen = miniaturas?.get(especie.id),
-                                    dimensiones = dimensiones,
-                                    onClick = { especieSeleccionadaId = especie.id },
-                                )
-                            }
                         }
                     }
                 }
@@ -235,14 +253,14 @@ internal fun CatalogoEspecies(data: AtlasData, modifier: Modifier = Modifier) {
     }
 }
 
-private suspend fun cargarIndiceImagenes(carpeta: String): Map<String, String> {
+private suspend fun cargarIndiceImagenesFamilias(): Map<String, String> {
     val contenido = withContext(Dispatchers.Default) {
-        Res.readBytes("files/figures/$carpeta/indice.json").decodeToString()
+        Res.readBytes("files/data/familias.json").decodeToString()
     }
     val entradas = withContext(Dispatchers.Default) {
-        jsonIndiceImagenes.decodeFromString<List<EntradaImagenEspecie>>(contenido)
+        jsonIndiceImagenes.decodeFromString<List<EntradaImagenFamilia>>(contenido)
     }
-    return entradas.associate { it.id to it.file }
+    return entradas.associate { it.family to it.file }
 }
 
 private data class EspecieIndexada(val especie: Species, val normalizado: String)
@@ -262,66 +280,105 @@ private val SaverFamiliasIndice = Saver<Set<String>, String>(
 )
 
 @Composable
-private fun FilaFamiliaIndice(
+private fun TarjetaFamiliaIndice(
     familia: String,
-    total: Int,
+    especies: List<Species>,
+    archivoImagen: String?,
     expandida: Boolean,
     dimensiones: Dimensiones,
     onClick: () -> Unit,
+    onEspecieClick: (Species) -> Unit,
 ) {
     val forma = RoundedCornerShape(dimensiones.espaciado / 2)
-    Row(
+    Column(
         modifier = Modifier
             .fillMaxWidth()
             .clip(forma)
-            .background(MaterialTheme.colorScheme.surfaceVariant, forma)
-            .clickable(onClick = onClick)
-            .padding(dimensiones.espaciado),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
+            .background(MaterialTheme.colorScheme.surfaceVariant, forma),
     ) {
-        Text("$familia ($total)", fontSize = dimensiones.tamanoTextoBase, fontWeight = FontWeight.Bold)
-        Text(if (expandida) "▾" else "▸", fontSize = dimensiones.tamanoTextoTitulo)
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onClick)
+                .padding(dimensiones.espaciado / 2),
+            verticalArrangement = Arrangement.spacedBy(dimensiones.espaciado / 3),
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(3f / 2f)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(Color.White),
+                contentAlignment = Alignment.Center,
+            ) {
+                if (archivoImagen != null) {
+                    ImagenEspecie(
+                        archivo = archivoImagen,
+                        descripcion = familia,
+                        carpetaImagen = "families",
+                        modifier = Modifier.fillMaxSize(),
+                        altura = null,
+                        mantenerProporcion = false,
+                    )
+                } else {
+                    Text("Sin imagen", fontSize = dimensiones.tamanoTextoBase * 0.75f)
+                }
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    "$familia (${especies.size})",
+                    modifier = Modifier.weight(1f),
+                    fontSize = dimensiones.tamanoTextoBase,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Text(if (expandida) "▾" else "▸", fontSize = dimensiones.tamanoTextoTitulo)
+            }
+        }
+        if (expandida) {
+            Column(
+                modifier = Modifier.padding(
+                    start = dimensiones.espaciado / 2,
+                    end = dimensiones.espaciado / 2,
+                    bottom = dimensiones.espaciado / 2,
+                ),
+                verticalArrangement = Arrangement.spacedBy(dimensiones.espaciado / 4),
+            ) {
+                for (especie in especies) {
+                    FilaEspecieFamilia(
+                        especie = especie,
+                        dimensiones = dimensiones,
+                        onClick = { onEspecieClick(especie) },
+                    )
+                }
+            }
+        }
     }
 }
 
 @Composable
-private fun FilaEspecieIndice(
+private fun FilaEspecieFamilia(
     especie: Species,
-    imagen: String?,
     dimensiones: Dimensiones,
     onClick: () -> Unit,
 ) {
-    Row(
+    Text(
+        text = especie.species,
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(dimensiones.espaciado / 3))
             .clickable(onClick = onClick)
-            .padding(vertical = dimensiones.espaciado / 4),
-        horizontalArrangement = Arrangement.spacedBy(dimensiones.espaciado / 2),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        if (imagen != null) {
-            ImagenEspecie(
-                archivo = imagen,
-                descripcion = especie.species,
-                carpetaImagen = "thumbnails",
-                modifier = Modifier.size(width = 120.dp, height = 64.dp),
-                altura = 64.dp,
-            )
-        } else {
-            Box(
-                modifier = Modifier
-                    .size(width = 120.dp, height = 64.dp)
-                    .clip(RoundedCornerShape(dimensiones.espaciado / 3))
-                    .background(MaterialTheme.colorScheme.surfaceVariant),
-                contentAlignment = Alignment.Center,
-            ) {
-                Text("Sin imagen", fontSize = dimensiones.tamanoTextoBase * 0.75f)
-            }
-        }
-        Text(especie.species, fontSize = dimensiones.tamanoTextoBase, fontWeight = FontWeight.Medium)
-    }
+            .padding(vertical = dimensiones.espaciado / 4, horizontal = dimensiones.espaciado / 6),
+        fontSize = dimensiones.tamanoTextoBase * 0.85f,
+        fontWeight = FontWeight.Medium,
+    )
 }
 
 @Composable
@@ -331,6 +388,7 @@ internal fun ImagenEspecie(
     carpetaImagen: String,
     modifier: Modifier = Modifier,
     altura: Dp?,
+    mantenerProporcion: Boolean = true,
 ) {
     val ruta = "$carpetaImagen/$archivo"
     var estado by remember(ruta) { mutableStateOf<EstadoImagenEspecie>(EstadoImagenEspecie.Cargando) }
@@ -354,13 +412,25 @@ internal fun ImagenEspecie(
     when (val actual = estado) {
         EstadoImagenEspecie.Cargando -> Box(
             modifier = modifier
-                .let { if (altura == null) it.aspectRatio(3f / 2f) else it.height(altura) }
+                .let {
+                    when {
+                        altura != null -> it.height(altura)
+                        mantenerProporcion -> it.aspectRatio(3f / 2f)
+                        else -> it
+                    }
+                }
                 .clip(RoundedCornerShape(8.dp))
                 .background(MaterialTheme.colorScheme.surfaceVariant),
         )
         is EstadoImagenEspecie.Error -> Box(
             modifier = modifier
-                .let { if (altura == null) it.aspectRatio(3f / 2f) else it.height(altura) }
+                .let {
+                    when {
+                        altura != null -> it.height(altura)
+                        mantenerProporcion -> it.aspectRatio(3f / 2f)
+                        else -> it
+                    }
+                }
                 .clip(RoundedCornerShape(8.dp))
                 .background(MaterialTheme.colorScheme.errorContainer),
             contentAlignment = Alignment.Center,
@@ -372,8 +442,11 @@ internal fun ImagenEspecie(
             contentDescription = descripcion,
             contentScale = ContentScale.Fit,
             modifier = modifier.let {
-                if (altura == null) it.aspectRatio(actual.bitmap.width.toFloat() / actual.bitmap.height)
-                else it
+                when {
+                    altura != null -> it.height(altura)
+                    mantenerProporcion -> it.aspectRatio(actual.bitmap.width.toFloat() / actual.bitmap.height)
+                    else -> it
+                }
             },
         )
     }
