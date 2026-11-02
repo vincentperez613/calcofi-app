@@ -103,7 +103,7 @@ class ValidacionTest {
         assertEquals(ResultadoValidacion.DebeSerEntero, validarConteo("12.5"))
     }
 
-    // ---- mensajes en lenguaje llano ----
+    // ---- mensajes ----
 
     @Test
     fun explicarNoMuestraNadaParaVacioOValido() {
@@ -112,14 +112,14 @@ class ValidacionTest {
     }
 
     @Test
-    fun explicarUsaLenguajeLlano() {
-        assertEquals("Solo números.", explicarConteo(ResultadoValidacion.NoNumerico))
+    fun explicarDiceQueEstaMal() {
+        assertEquals("Numbers only.", explicarConteo(ResultadoValidacion.NoNumerico))
         assertEquals(
-            "La talla debe estar entre 0 y 200 mm.",
+            "Body length must be between 0 and 200 mm.",
             explicarTalla(ResultadoValidacion.FueraDeRango(0.0, 200.0)),
         )
         assertEquals(
-            "El conteo debe ser un número entero, sin decimales.",
+            "Count must be a whole number.",
             explicarConteo(ResultadoValidacion.DebeSerEntero),
         )
     }

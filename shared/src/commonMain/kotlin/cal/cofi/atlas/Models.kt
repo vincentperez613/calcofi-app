@@ -154,6 +154,8 @@ data class FigureRef(
     /** [x0, y0, x1, y1] en pixeles de la lamina. */
     val box: List<Int>,
     val sizeMm: Double? = null,
+    /** Talla tal como la rotula el atlas (p.ej. "4.5 mm"), cuando hay. */
+    val sizeLabel: String? = null,
     val stage: Stage? = null,
     /**
      * De donde salio la etapa: "caption" (la dice el pie) o "media"/"baja"
@@ -168,13 +170,15 @@ data class FigureRef(
     val captionTaxon: String? = null,
     val species: String? = null,
     val uncertain: Boolean = false,
+    /** La figura quedo marcada como pendiente de revision manual. */
+    val needsReview: Boolean = false,
 ) {
     /**
      * Lo que se le debe MOSTRAR al usuario como identidad del dibujo.
      * Usar el nombre de la ficha en su lugar prometeria precision que el
      * dibujo no respalda.
      */
-    fun displayLabel(): String = captionTaxon ?: species ?: "sin identificar"
+    fun displayLabel(): String = captionTaxon ?: species ?: "unidentified"
 }
 
 class AtlasData(

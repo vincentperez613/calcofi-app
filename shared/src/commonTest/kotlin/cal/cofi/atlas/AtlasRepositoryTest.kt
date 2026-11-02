@@ -49,6 +49,14 @@ class AtlasRepositoryTest {
     }
 
     @Test
+    fun cargaMetadatosDeFigurasDelBundle() = runTest {
+        val listo = assertIs<EstadoCarga.Listo>(AtlasRepository().cargar())
+
+        assertTrue(listo.data.figures.any { it.sizeLabel != null }, "figure size labels are missing")
+        assertTrue(listo.data.figures.any { it.needsReview }, "figure review flags are missing")
+    }
+
+    @Test
     fun lifeHistoryEsOpcionalYDescartaMesesImposibles() = runTest {
         val speciesJson = """
             [

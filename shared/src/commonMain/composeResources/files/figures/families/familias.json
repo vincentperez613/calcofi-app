@@ -1,0 +1,2357 @@
+[
+ {
+  "family": "Elopidae",
+  "file": "Elopidae.webp",
+  "pdf_page": 75,
+  "printed_page": 63,
+  "row": 1,
+  "col": 1,
+  "bbox": [
+   244,
+   496,
+   866,
+   618
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Derichthyidae",
+  "file": "Derichthyidae.webp",
+  "pdf_page": 75,
+  "printed_page": 63,
+  "row": 1,
+  "col": 2,
+  "bbox": [
+   988,
+   467,
+   1599,
+   612
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Saccopharyngidae",
+  "file": "Saccopharyngidae.webp",
+  "pdf_page": 75,
+  "printed_page": 63,
+  "row": 1,
+  "col": 3,
+  "bbox": [
+   1738,
+   394,
+   2358,
+   657
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Albulidae",
+  "file": "Albulidae.webp",
+  "pdf_page": 75,
+  "printed_page": 63,
+  "row": 2,
+  "col": 1,
+  "bbox": [
+   245,
+   932,
+   857,
+   1021
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Nemichthyidae",
+  "file": "Nemichthyidae.webp",
+  "pdf_page": 75,
+  "printed_page": 63,
+  "row": 2,
+  "col": 2,
+  "bbox": [
+   986,
+   936,
+   1600,
+   1005
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Eurypharyngidae",
+  "file": "Eurypharyngidae.webp",
+  "pdf_page": 75,
+  "printed_page": 63,
+  "row": 2,
+  "col": 3,
+  "bbox": [
+   1738,
+   868,
+   2342,
+   1070
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Notacanthidae",
+  "file": "Notacanthidae.webp",
+  "pdf_page": 75,
+  "printed_page": 63,
+  "row": 3,
+  "col": 1,
+  "bbox": [
+   282,
+   1189,
+   836,
+   1577
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Nettastomatidae",
+  "file": "Nettastomatidae.webp",
+  "pdf_page": 75,
+  "printed_page": 63,
+  "row": 3,
+  "col": 2,
+  "bbox": [
+   982,
+   1406,
+   1602,
+   1501
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Clupeidae",
+  "file": "Clupeidae.webp",
+  "pdf_page": 75,
+  "printed_page": 63,
+  "row": 3,
+  "col": 3,
+  "bbox": [
+   1732,
+   1412,
+   2350,
+   1503
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Muraenidae",
+  "file": "Muraenidae.webp",
+  "pdf_page": 75,
+  "printed_page": 63,
+  "row": 4,
+  "col": 1,
+  "bbox": [
+   231,
+   1838,
+   849,
+   1942
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Serrivomeridae",
+  "file": "Serrivomeridae.webp",
+  "pdf_page": 75,
+  "printed_page": 63,
+  "row": 4,
+  "col": 2,
+  "bbox": [
+   992,
+   1824,
+   1602,
+   1966
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Engraulidae",
+  "file": "Engraulidae.webp",
+  "pdf_page": 75,
+  "printed_page": 63,
+  "row": 4,
+  "col": 3,
+  "bbox": [
+   1731,
+   1820,
+   2350,
+   1941
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Ophichthidae",
+  "file": "Ophichthidae.webp",
+  "pdf_page": 75,
+  "printed_page": 63,
+  "row": 5,
+  "col": 1,
+  "bbox": [
+   229,
+   2273,
+   851,
+   2358
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Monognathidae",
+  "file": "Monognathidae.webp",
+  "pdf_page": 75,
+  "printed_page": 63,
+  "row": 5,
+  "col": 2,
+  "bbox": [
+   992,
+   2254,
+   1606,
+   2382
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Argentinidae",
+  "file": "Argentinidae.webp",
+  "pdf_page": 75,
+  "printed_page": 63,
+  "row": 5,
+  "col": 3,
+  "bbox": [
+   1730,
+   2262,
+   2341,
+   2380
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Congridae",
+  "file": "Congridae.webp",
+  "pdf_page": 75,
+  "printed_page": 63,
+  "row": 6,
+  "col": 1,
+  "bbox": [
+   231,
+   2704,
+   850,
+   2810
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Cyematidae",
+  "file": "Cyematidae.webp",
+  "pdf_page": 75,
+  "printed_page": 63,
+  "row": 6,
+  "col": 2,
+  "bbox": [
+   982,
+   2604,
+   1595,
+   2886
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Bathylagidae",
+  "file": "Bathylagidae.webp",
+  "pdf_page": 75,
+  "printed_page": 63,
+  "row": 6,
+  "col": 3,
+  "bbox": [
+   1725,
+   2677,
+   2345,
+   2809
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Microstomatidae",
+  "file": "Microstomatidae.webp",
+  "pdf_page": 76,
+  "printed_page": 64,
+  "row": 1,
+  "col": 1,
+  "bbox": [
+   186,
+   408,
+   803,
+   556
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Stemoptychidae",
+  "file": "Stemoptychidae.webp",
+  "pdf_page": 76,
+  "printed_page": 64,
+  "row": 1,
+  "col": 2,
+  "bbox": [
+   931,
+   441,
+   1547,
+   549
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Malacosteidae",
+  "file": "Malacosteidae.webp",
+  "pdf_page": 76,
+  "printed_page": 64,
+  "row": 1,
+  "col": 3,
+  "bbox": [
+   1679,
+   427,
+   2292,
+   582
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Opisthoproctidae",
+  "file": "Opisthoproctidae.webp",
+  "pdf_page": 76,
+  "printed_page": 64,
+  "row": 2,
+  "col": 1,
+  "bbox": [
+   183,
+   840,
+   791,
+   1024
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Phosichthyidae",
+  "file": "Phosichthyidae.webp",
+  "pdf_page": 76,
+  "printed_page": 64,
+  "row": 2,
+  "col": 2,
+  "bbox": [
+   932,
+   874,
+   1542,
+   987
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Idiacanthidae",
+  "file": "Idiacanthidae.webp",
+  "pdf_page": 76,
+  "printed_page": 64,
+  "row": 2,
+  "col": 3,
+  "bbox": [
+   1671,
+   834,
+   2285,
+   968
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Alepocephalidae",
+  "file": "Alepocephalidae.webp",
+  "pdf_page": 76,
+  "printed_page": 64,
+  "row": 3,
+  "col": 1,
+  "bbox": [
+   183,
+   1306,
+   873,
+   1433
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Chauliodontidae",
+  "file": "Chauliodontidae.webp",
+  "pdf_page": 76,
+  "printed_page": 64,
+  "row": 3,
+  "col": 2,
+  "bbox": [
+   935,
+   1310,
+   1554,
+   1407
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Aulopidae",
+  "file": "Aulopidae.webp",
+  "pdf_page": 76,
+  "printed_page": 64,
+  "row": 3,
+  "col": 3,
+  "bbox": [
+   1683,
+   1289,
+   2288,
+   1440
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Platytroctidae",
+  "file": "Platytroctidae.webp",
+  "pdf_page": 76,
+  "printed_page": 64,
+  "row": 4,
+  "col": 1,
+  "bbox": [
+   184,
+   1700,
+   798,
+   1860
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Stomiidae",
+  "file": "Stomiidae.webp",
+  "pdf_page": 76,
+  "printed_page": 64,
+  "row": 4,
+  "col": 2,
+  "bbox": [
+   930,
+   1744,
+   1544,
+   1842
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Scopelarchidae",
+  "file": "Scopelarchidae.webp",
+  "pdf_page": 76,
+  "printed_page": 64,
+  "row": 4,
+  "col": 3,
+  "bbox": [
+   1682,
+   1729,
+   2293,
+   1859
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Osmeridae",
+  "file": "Osmeridae.webp",
+  "pdf_page": 76,
+  "printed_page": 64,
+  "row": 5,
+  "col": 1,
+  "bbox": [
+   184,
+   2229,
+   796,
+   2348
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Astronesthidae",
+  "file": "Astronesthidae.webp",
+  "pdf_page": 76,
+  "printed_page": 64,
+  "row": 5,
+  "col": 2,
+  "bbox": [
+   927,
+   2196,
+   1547,
+   2334
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Notosudidae",
+  "file": "Notosudidae.webp",
+  "pdf_page": 76,
+  "printed_page": 64,
+  "row": 5,
+  "col": 3,
+  "bbox": [
+   1637,
+   2240,
+   2291,
+   2328
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Gonostomatidae",
+  "file": "Gonostomatidae.webp",
+  "pdf_page": 76,
+  "printed_page": 64,
+  "row": 6,
+  "col": 1,
+  "bbox": [
+   181,
+   2718,
+   794,
+   2817
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Melanostomiidae",
+  "file": "Melanostomiidae.webp",
+  "pdf_page": 76,
+  "printed_page": 64,
+  "row": 6,
+  "col": 2,
+  "bbox": [
+   925,
+   2700,
+   1542,
+   2860
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Synodontidae",
+  "file": "Synodontidae.webp",
+  "pdf_page": 76,
+  "printed_page": 64,
+  "row": 6,
+  "col": 3,
+  "bbox": [
+   1679,
+   2697,
+   2290,
+   2819
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Paralepididae",
+  "file": "Paralepididae.webp",
+  "pdf_page": 77,
+  "printed_page": 65,
+  "row": 1,
+  "col": 1,
+  "bbox": [
+   257,
+   521,
+   877,
+   596
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Myctophidae",
+  "file": "Myctophidae.webp",
+  "pdf_page": 77,
+  "printed_page": 65,
+  "row": 1,
+  "col": 2,
+  "bbox": [
+   987,
+   453,
+   1609,
+   614
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Ophidiidae",
+  "file": "Ophidiidae.webp",
+  "pdf_page": 77,
+  "printed_page": 65,
+  "row": 1,
+  "col": 3,
+  "bbox": [
+   1743,
+   472,
+   2355,
+   628
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Anotopteridae",
+  "file": "Anotopteridae.webp",
+  "pdf_page": 77,
+  "printed_page": 65,
+  "row": 2,
+  "col": 1,
+  "bbox": [
+   252,
+   999,
+   866,
+   1080
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Bregmacerotidae",
+  "file": "Bregmacerotidae.webp",
+  "pdf_page": 77,
+  "printed_page": 65,
+  "row": 2,
+  "col": 2,
+  "bbox": [
+   987,
+   916,
+   1603,
+   1150
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Carapidae",
+  "file": "Carapidae.webp",
+  "pdf_page": 77,
+  "printed_page": 65,
+  "row": 2,
+  "col": 3,
+  "bbox": [
+   1695,
+   936,
+   2347,
+   1097
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Evermannellidae",
+  "file": "Evermannellidae.webp",
+  "pdf_page": 77,
+  "printed_page": 65,
+  "row": 3,
+  "col": 1,
+  "bbox": [
+   250,
+   1439,
+   869,
+   1618
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Macrouridae",
+  "file": "Macrouridae.webp",
+  "pdf_page": 77,
+  "printed_page": 65,
+  "row": 3,
+  "col": 2,
+  "bbox": [
+   989,
+   1421,
+   1604,
+   1706
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Bythitidae",
+  "file": "Bythitidae.webp",
+  "pdf_page": 77,
+  "printed_page": 65,
+  "row": 3,
+  "col": 3,
+  "bbox": [
+   1742,
+   1473,
+   2355,
+   1604
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Alepisauridae",
+  "file": "Alepisauridae.webp",
+  "pdf_page": 77,
+  "printed_page": 65,
+  "row": 4,
+  "col": 1,
+  "bbox": [
+   247,
+   2078,
+   863,
+   2226
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Moridae",
+  "file": "Moridae.webp",
+  "pdf_page": 77,
+  "printed_page": 65,
+  "row": 4,
+  "col": 2,
+  "bbox": [
+   990,
+   2028,
+   1607,
+   2308
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Batrachoididae",
+  "file": "Batrachoididae.webp",
+  "pdf_page": 77,
+  "printed_page": 65,
+  "row": 4,
+  "col": 3,
+  "bbox": [
+   1731,
+   2057,
+   2357,
+   2251
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Neoscopelidae",
+  "file": "Neoscopelidae.webp",
+  "pdf_page": 77,
+  "printed_page": 65,
+  "row": 5,
+  "col": 1,
+  "bbox": [
+   245,
+   2634,
+   863,
+   2907
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Merlucciidae",
+  "file": "Merlucciidae.webp",
+  "pdf_page": 77,
+  "printed_page": 65,
+  "row": 5,
+  "col": 2,
+  "bbox": [
+   988,
+   2648,
+   1603,
+   2849
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Lophiidae",
+  "file": "Lophiidae.webp",
+  "pdf_page": 77,
+  "printed_page": 65,
+  "row": 5,
+  "col": 3,
+  "bbox": [
+   1748,
+   2492,
+   2360,
+   2884
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Antennariidae",
+  "file": "Antennariidae.webp",
+  "pdf_page": 78,
+  "printed_page": 66,
+  "row": 1,
+  "col": 1,
+  "bbox": [
+   192,
+   456,
+   811,
+   782
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Oneirodidae",
+  "file": "Oneirodidae.webp",
+  "pdf_page": 78,
+  "printed_page": 66,
+  "row": 1,
+  "col": 2,
+  "bbox": [
+   929,
+   502,
+   1548,
+   774
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Linophrynidae",
+  "file": "Linophrynidae.webp",
+  "pdf_page": 78,
+  "printed_page": 66,
+  "row": 1,
+  "col": 3,
+  "bbox": [
+   1671,
+   492,
+   2294,
+   771
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Chaunacidae",
+  "file": "Chaunacidae.webp",
+  "pdf_page": 78,
+  "printed_page": 66,
+  "row": 2,
+  "col": 1,
+  "bbox": [
+   187,
+   982,
+   811,
+   1325
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Thaumatichthyidae",
+  "file": "Thaumatichthyidae.webp",
+  "pdf_page": 78,
+  "printed_page": 66,
+  "row": 2,
+  "col": 2,
+  "bbox": [
+   923,
+   1028,
+   1544,
+   1317
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Gobiesocidae",
+  "file": "Gobiesocidae.webp",
+  "pdf_page": 78,
+  "printed_page": 66,
+  "row": 2,
+  "col": 3,
+  "bbox": [
+   1679,
+   1092,
+   2293,
+   1237
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Ogcocephalidae",
+  "file": "Ogcocephalidae.webp",
+  "pdf_page": 78,
+  "printed_page": 66,
+  "row": 3,
+  "col": 1,
+  "bbox": [
+   183,
+   1546,
+   805,
+   1794
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Centrophrynidae",
+  "file": "Centrophrynidae.webp",
+  "pdf_page": 78,
+  "printed_page": 66,
+  "row": 3,
+  "col": 2,
+  "bbox": [
+   922,
+   1537,
+   1539,
+   1821
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Atherinidae",
+  "file": "Atherinidae.webp",
+  "pdf_page": 78,
+  "printed_page": 66,
+  "row": 3,
+  "col": 3,
+  "bbox": [
+   1664,
+   1603,
+   2289,
+   1722
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Caulophrynidae",
+  "file": "Caulophrynidae.webp",
+  "pdf_page": 78,
+  "printed_page": 66,
+  "row": 4,
+  "col": 1,
+  "bbox": [
+   238,
+   1920,
+   746,
+   2349
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Ceratiidae",
+  "file": "Ceratiidae.webp",
+  "pdf_page": 78,
+  "printed_page": 66,
+  "row": 4,
+  "col": 2,
+  "bbox": [
+   918,
+   2066,
+   1543,
+   2332
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Cyprinodontidae",
+  "file": "Cyprinodontidae.webp",
+  "pdf_page": 78,
+  "printed_page": 66,
+  "row": 4,
+  "col": 3,
+  "bbox": [
+   1666,
+   2134,
+   2285,
+   2263
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Melanocetidae",
+  "file": "Melanocetidae.webp",
+  "pdf_page": 78,
+  "printed_page": 66,
+  "row": 5,
+  "col": 1,
+  "bbox": [
+   184,
+   2606,
+   813,
+   2888
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Gigantactinidae",
+  "file": "Gigantactinidae.webp",
+  "pdf_page": 78,
+  "printed_page": 66,
+  "row": 5,
+  "col": 2,
+  "bbox": [
+   925,
+   2549,
+   1538,
+   2891
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Scomberesocidae",
+  "file": "Scomberesocidae.webp",
+  "pdf_page": 78,
+  "printed_page": 66,
+  "row": 5,
+  "col": 3,
+  "bbox": [
+   1676,
+   2690,
+   2289,
+   2812
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Belonidae",
+  "file": "Belonidae.webp",
+  "pdf_page": 79,
+  "printed_page": 67,
+  "row": 1,
+  "col": 1,
+  "bbox": [
+   3,
+   391,
+   869,
+   626
+  ],
+  "n_manchas": 2
+ },
+ {
+  "family": "Trachipteridae",
+  "file": "Trachipteridae.webp",
+  "pdf_page": 79,
+  "printed_page": 67,
+  "row": 1,
+  "col": 2,
+  "bbox": [
+   985,
+   346,
+   1601,
+   726
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Mirapinnidae",
+  "file": "Mirapinnidae.webp",
+  "pdf_page": 79,
+  "printed_page": 67,
+  "row": 1,
+  "col": 3,
+  "bbox": [
+   1739,
+   535,
+   2351,
+   599
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Hemiraphidae",
+  "file": "Hemiraphidae.webp",
+  "pdf_page": 79,
+  "printed_page": 67,
+  "row": 2,
+  "col": 1,
+  "bbox": [
+   245,
+   998,
+   867,
+   1102
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Diretmidae",
+  "file": "Diretmidae.webp",
+  "pdf_page": 79,
+  "printed_page": 67,
+  "row": 2,
+  "col": 2,
+  "bbox": [
+   1073,
+   815,
+   1528,
+   1222
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Fistulariidae",
+  "file": "Fistulariidae.webp",
+  "pdf_page": 79,
+  "printed_page": 67,
+  "row": 2,
+  "col": 3,
+  "bbox": [
+   1743,
+   1019,
+   2354,
+   1093
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Exocoetidae",
+  "file": "Exocoetidae.webp",
+  "pdf_page": 79,
+  "printed_page": 67,
+  "row": 3,
+  "col": 1,
+  "bbox": [
+   250,
+   1535,
+   866,
+   1700
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Anoplogastridae",
+  "file": "Anoplogastridae.webp",
+  "pdf_page": 79,
+  "printed_page": 67,
+  "row": 3,
+  "col": 2,
+  "bbox": [
+   1062,
+   1389,
+   1521,
+   1809
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Centriscidae",
+  "file": "Centriscidae.webp",
+  "pdf_page": 79,
+  "printed_page": 67,
+  "row": 3,
+  "col": 3,
+  "bbox": [
+   1745,
+   1538,
+   2354,
+   1714
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Lophotidae",
+  "file": "Lophotidae.webp",
+  "pdf_page": 79,
+  "printed_page": 67,
+  "row": 4,
+  "col": 1,
+  "bbox": [
+   244,
+   1977,
+   864,
+   2348
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Holocentridae",
+  "file": "Holocentridae.webp",
+  "pdf_page": 79,
+  "printed_page": 67,
+  "row": 4,
+  "col": 2,
+  "bbox": [
+   974,
+   2039,
+   1592,
+   2287
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Syngnathidae",
+  "file": "Syngnathidae.webp",
+  "pdf_page": 79,
+  "printed_page": 67,
+  "row": 4,
+  "col": 3,
+  "bbox": [
+   1742,
+   2097,
+   2354,
+   2197
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Radiicephalidae",
+  "file": "Radiicephalidae.webp",
+  "pdf_page": 79,
+  "printed_page": 67,
+  "row": 5,
+  "col": 1,
+  "bbox": [
+   236,
+   2626,
+   849,
+   2858
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Melamphaidae",
+  "file": "Melamphaidae.webp",
+  "pdf_page": 79,
+  "printed_page": 67,
+  "row": 5,
+  "col": 2,
+  "bbox": [
+   984,
+   2614,
+   1600,
+   2883
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Scorpaenidae",
+  "file": "Scorpaenidae.webp",
+  "pdf_page": 79,
+  "printed_page": 67,
+  "row": 5,
+  "col": 3,
+  "bbox": [
+   1740,
+   2654,
+   2357,
+   2863
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Triglidae",
+  "file": "Triglidae.webp",
+  "pdf_page": 80,
+  "printed_page": 68,
+  "row": 1,
+  "col": 1,
+  "bbox": [
+   191,
+   480,
+   796,
+   682
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Agonidae",
+  "file": "Agonidae.webp",
+  "pdf_page": 80,
+  "printed_page": 68,
+  "row": 1,
+  "col": 2,
+  "bbox": [
+   929,
+   522,
+   1541,
+   639
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Apogonidae",
+  "file": "Apogonidae.webp",
+  "pdf_page": 80,
+  "printed_page": 68,
+  "row": 1,
+  "col": 3,
+  "bbox": [
+   1676,
+   363,
+   2543,
+   690
+  ],
+  "n_manchas": 2
+ },
+ {
+  "family": "Anoplopomatidae",
+  "file": "Anoplopomatidae.webp",
+  "pdf_page": 80,
+  "printed_page": 68,
+  "row": 2,
+  "col": 1,
+  "bbox": [
+   190,
+   1017,
+   804,
+   1126
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Cyclopteridae",
+  "file": "Cyclopteridae.webp",
+  "pdf_page": 80,
+  "printed_page": 68,
+  "row": 2,
+  "col": 2,
+  "bbox": [
+   922,
+   950,
+   1538,
+   1169
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Echeneidae",
+  "file": "Echeneidae.webp",
+  "pdf_page": 80,
+  "printed_page": 68,
+  "row": 2,
+  "col": 3,
+  "bbox": [
+   1680,
+   1023,
+   2293,
+   1142
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Hexagrammidae",
+  "file": "Hexagrammidae.webp",
+  "pdf_page": 80,
+  "printed_page": 68,
+  "row": 3,
+  "col": 1,
+  "bbox": [
+   180,
+   1578,
+   801,
+   1732
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Polyprionidae",
+  "file": "Polyprionidae.webp",
+  "pdf_page": 80,
+  "printed_page": 68,
+  "row": 3,
+  "col": 2,
+  "bbox": [
+   932,
+   1569,
+   1543,
+   1753
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Carangidae",
+  "file": "Carangidae.webp",
+  "pdf_page": 80,
+  "printed_page": 68,
+  "row": 3,
+  "col": 3,
+  "bbox": [
+   1670,
+   1477,
+   2289,
+   1811
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Cottidae",
+  "file": "Cottidae.webp",
+  "pdf_page": 80,
+  "printed_page": 68,
+  "row": 4,
+  "col": 1,
+  "bbox": [
+   180,
+   2058,
+   789,
+   2252
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Serranidae",
+  "file": "Serranidae.webp",
+  "pdf_page": 80,
+  "printed_page": 68,
+  "row": 4,
+  "col": 2,
+  "bbox": [
+   925,
+   2053,
+   1546,
+   2247
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Nematistiidae",
+  "file": "Nematistiidae.webp",
+  "pdf_page": 80,
+  "printed_page": 68,
+  "row": 4,
+  "col": 3,
+  "bbox": [
+   1675,
+   2070,
+   2291,
+   2264
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Psychrolutidae",
+  "file": "Psychrolutidae.webp",
+  "pdf_page": 80,
+  "printed_page": 68,
+  "row": 5,
+  "col": 1,
+  "bbox": [
+   185,
+   2630,
+   800,
+   2891
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Priacanthidae",
+  "file": "Priacanthidae.webp",
+  "pdf_page": 80,
+  "printed_page": 68,
+  "row": 5,
+  "col": 2,
+  "bbox": [
+   920,
+   2522,
+   1538,
+   2866
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Coryphaenidae",
+  "file": "Coryphaenidae.webp",
+  "pdf_page": 80,
+  "printed_page": 68,
+  "row": 5,
+  "col": 3,
+  "bbox": [
+   1671,
+   2661,
+   2286,
+   2814
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Bramidae",
+  "file": "Bramidae.webp",
+  "pdf_page": 81,
+  "printed_page": 69,
+  "row": 1,
+  "col": 1,
+  "bbox": [
+   6,
+   466,
+   862,
+   705
+  ],
+  "n_manchas": 2
+ },
+ {
+  "family": "Gerreidae",
+  "file": "Gerreidae.webp",
+  "pdf_page": 81,
+  "printed_page": 69,
+  "row": 1,
+  "col": 2,
+  "bbox": [
+   980,
+   478,
+   1591,
+   643
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Kyphosidae",
+  "file": "Kyphosidae.webp",
+  "pdf_page": 81,
+  "printed_page": 69,
+  "row": 1,
+  "col": 3,
+  "bbox": [
+   1737,
+   459,
+   2354,
+   645
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Caristiidae",
+  "file": "Caristiidae.webp",
+  "pdf_page": 81,
+  "printed_page": 69,
+  "row": 2,
+  "col": 1,
+  "bbox": [
+   246,
+   936,
+   853,
+   1261
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Haemulidae",
+  "file": "Haemulidae.webp",
+  "pdf_page": 81,
+  "printed_page": 69,
+  "row": 2,
+  "col": 2,
+  "bbox": [
+   974,
+   1046,
+   1597,
+   1215
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Ephippidae",
+  "file": "Ephippidae.webp",
+  "pdf_page": 81,
+  "printed_page": 69,
+  "row": 2,
+  "col": 3,
+  "bbox": [
+   1736,
+   952,
+   2345,
+   1257
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Lutjanidae",
+  "file": "Lutjanidae.webp",
+  "pdf_page": 81,
+  "printed_page": 69,
+  "row": 3,
+  "col": 1,
+  "bbox": [
+   243,
+   1442,
+   830,
+   1859
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Sparidae",
+  "file": "Sparidae.webp",
+  "pdf_page": 81,
+  "printed_page": 69,
+  "row": 3,
+  "col": 2,
+  "bbox": [
+   979,
+   1628,
+   1588,
+   1825
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Chaetodontidae",
+  "file": "Chaetodontidae.webp",
+  "pdf_page": 81,
+  "printed_page": 69,
+  "row": 3,
+  "col": 3,
+  "bbox": [
+   1733,
+   1590,
+   2346,
+   1839
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Malacanthidae",
+  "file": "Malacanthidae.webp",
+  "pdf_page": 81,
+  "printed_page": 69,
+  "row": 4,
+  "col": 1,
+  "bbox": [
+   233,
+   2055,
+   852,
+   2346
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Sciaenidae",
+  "file": "Sciaenidae.webp",
+  "pdf_page": 81,
+  "printed_page": 69,
+  "row": 4,
+  "col": 2,
+  "bbox": [
+   979,
+   2125,
+   1597,
+   2327
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Pomacentridae",
+  "file": "Pomacentridae.webp",
+  "pdf_page": 81,
+  "printed_page": 69,
+  "row": 4,
+  "col": 3,
+  "bbox": [
+   1740,
+   2103,
+   2350,
+   2322
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Lobotidae",
+  "file": "Lobotidae.webp",
+  "pdf_page": 81,
+  "printed_page": 69,
+  "row": 5,
+  "col": 1,
+  "bbox": [
+   240,
+   2574,
+   861,
+   2880
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Mullidae",
+  "file": "Mullidae.webp",
+  "pdf_page": 81,
+  "printed_page": 69,
+  "row": 5,
+  "col": 2,
+  "bbox": [
+   978,
+   2649,
+   1598,
+   2815
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Cirrhitidae",
+  "file": "Cirrhitidae.webp",
+  "pdf_page": 81,
+  "printed_page": 69,
+  "row": 5,
+  "col": 3,
+  "bbox": [
+   1737,
+   2649,
+   2353,
+   2812
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Opistognathidae",
+  "file": "Opistognathidae.webp",
+  "pdf_page": 82,
+  "printed_page": 70,
+  "row": 1,
+  "col": 1,
+  "bbox": [
+   202,
+   390,
+   821,
+   590
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Scaridae",
+  "file": "Scaridae.webp",
+  "pdf_page": 82,
+  "printed_page": 70,
+  "row": 1,
+  "col": 2,
+  "bbox": [
+   941,
+   372,
+   1557,
+   551
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Pholidae",
+  "file": "Pholidae.webp",
+  "pdf_page": 82,
+  "printed_page": 70,
+  "row": 1,
+  "col": 3,
+  "bbox": [
+   1690,
+   412,
+   2306,
+   532
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Howellidae",
+  "file": "Howellidae.webp",
+  "pdf_page": 82,
+  "printed_page": 70,
+  "row": 2,
+  "col": 1,
+  "bbox": [
+   205,
+   966,
+   818,
+   1177
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Bathymasteridae",
+  "file": "Bathymasteridae.webp",
+  "pdf_page": 82,
+  "printed_page": 70,
+  "row": 2,
+  "col": 2,
+  "bbox": [
+   931,
+   1019,
+   1558,
+   1136
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Anarhichadidae",
+  "file": "Anarhichadidae.webp",
+  "pdf_page": 82,
+  "printed_page": 70,
+  "row": 2,
+  "col": 3,
+  "bbox": [
+   1756,
+   782,
+   2227,
+   1202
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Mugilidae",
+  "file": "Mugilidae.webp",
+  "pdf_page": 82,
+  "printed_page": 70,
+  "row": 3,
+  "col": 1,
+  "bbox": [
+   204,
+   1572,
+   815,
+   1769
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Zoarcidae",
+  "file": "Zoarcidae.webp",
+  "pdf_page": 82,
+  "printed_page": 70,
+  "row": 3,
+  "col": 2,
+  "bbox": [
+   929,
+   1424,
+   1558,
+   1801
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Zaproridae",
+  "file": "Zaproridae.webp",
+  "pdf_page": 82,
+  "printed_page": 70,
+  "row": 3,
+  "col": 3,
+  "bbox": [
+   1689,
+   1591,
+   2307,
+   1747
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Polynemidae",
+  "file": "Polynemidae.webp",
+  "pdf_page": 82,
+  "printed_page": 70,
+  "row": 4,
+  "col": 1,
+  "bbox": [
+   200,
+   2112,
+   823,
+   2333
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Stichaeidae",
+  "file": "Stichaeidae.webp",
+  "pdf_page": 82,
+  "printed_page": 70,
+  "row": 4,
+  "col": 2,
+  "bbox": [
+   939,
+   2171,
+   1555,
+   2259
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Chiasmodontidae",
+  "file": "Chiasmodontidae.webp",
+  "pdf_page": 82,
+  "printed_page": 70,
+  "row": 4,
+  "col": 3,
+  "bbox": [
+   1692,
+   2151,
+   2302,
+   2275
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Labridae",
+  "file": "Labridae.webp",
+  "pdf_page": 82,
+  "printed_page": 70,
+  "row": 5,
+  "col": 1,
+  "bbox": [
+   199,
+   2677,
+   822,
+   2834
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Cryptacanthodidae",
+  "file": "Cryptacanthodidae.webp",
+  "pdf_page": 82,
+  "printed_page": 70,
+  "row": 5,
+  "col": 2,
+  "bbox": [
+   934,
+   2702,
+   1551,
+   2813
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Ammodytidae",
+  "file": "Ammodytidae.webp",
+  "pdf_page": 82,
+  "printed_page": 70,
+  "row": 5,
+  "col": 3,
+  "bbox": [
+   1684,
+   2707,
+   2297,
+   2812
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Uranoscopidae",
+  "file": "Uranoscopidae.webp",
+  "pdf_page": 83,
+  "printed_page": 71,
+  "row": 1,
+  "col": 1,
+  "bbox": [
+   247,
+   410,
+   859,
+   651
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Blenniidae",
+  "file": "Blenniidae.webp",
+  "pdf_page": 83,
+  "printed_page": 71,
+  "row": 1,
+  "col": 2,
+  "bbox": [
+   976,
+   445,
+   1593,
+   595
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Sphyraenidae",
+  "file": "Sphyraenidae.webp",
+  "pdf_page": 83,
+  "printed_page": 71,
+  "row": 1,
+  "col": 3,
+  "bbox": [
+   1735,
+   447,
+   2350,
+   582
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Tripterygiidae",
+  "file": "Tripterygiidae.webp",
+  "pdf_page": 83,
+  "printed_page": 71,
+  "row": 2,
+  "col": 1,
+  "bbox": [
+   241,
+   931,
+   856,
+   1066
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Icosteidae",
+  "file": "Icosteidae.webp",
+  "pdf_page": 83,
+  "printed_page": 71,
+  "row": 2,
+  "col": 2,
+  "bbox": [
+   977,
+   906,
+   1591,
+   1106
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Gempylidae",
+  "file": "Gempylidae.webp",
+  "pdf_page": 83,
+  "printed_page": 71,
+  "row": 2,
+  "col": 3,
+  "bbox": [
+   1738,
+   808,
+   2350,
+   1137
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Labrisomidae",
+  "file": "Labrisomidae.webp",
+  "pdf_page": 83,
+  "printed_page": 71,
+  "row": 3,
+  "col": 1,
+  "bbox": [
+   241,
+   1374,
+   860,
+   1519
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Callionymidae",
+  "file": "Callionymidae.webp",
+  "pdf_page": 83,
+  "printed_page": 71,
+  "row": 3,
+  "col": 2,
+  "bbox": [
+   975,
+   1327,
+   1588,
+   1534
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Scombridae",
+  "file": "Scombridae.webp",
+  "pdf_page": 83,
+  "printed_page": 71,
+  "row": 3,
+  "col": 3,
+  "bbox": [
+   1737,
+   1346,
+   2350,
+   1567
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Clinidae",
+  "file": "Clinidae.webp",
+  "pdf_page": 83,
+  "printed_page": 71,
+  "row": 4,
+  "col": 1,
+  "bbox": [
+   237,
+   1816,
+   861,
+   1941
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Eleotridae",
+  "file": "Eleotridae.webp",
+  "pdf_page": 83,
+  "printed_page": 71,
+  "row": 4,
+  "col": 2,
+  "bbox": [
+   978,
+   1761,
+   1592,
+   1955
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Trichiuridae",
+  "file": "Trichiuridae.webp",
+  "pdf_page": 83,
+  "printed_page": 71,
+  "row": 4,
+  "col": 3,
+  "bbox": [
+   1737,
+   1739,
+   2347,
+   1954
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Chaenopsidae",
+  "file": "Chaenopsidae.webp",
+  "pdf_page": 83,
+  "printed_page": 71,
+  "row": 5,
+  "col": 1,
+  "bbox": [
+   234,
+   2248,
+   854,
+   2380
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Gobiidae",
+  "file": "Gobiidae.webp",
+  "pdf_page": 83,
+  "printed_page": 71,
+  "row": 5,
+  "col": 2,
+  "bbox": [
+   970,
+   2229,
+   1589,
+   2376
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Centrolophidae",
+  "file": "Centrolophidae.webp",
+  "pdf_page": 83,
+  "printed_page": 71,
+  "row": 5,
+  "col": 3,
+  "bbox": [
+   1731,
+   2243,
+   2349,
+   2385
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Dactyloscopidae",
+  "file": "Dactyloscopidae.webp",
+  "pdf_page": 83,
+  "printed_page": 71,
+  "row": 6,
+  "col": 1,
+  "bbox": [
+   230,
+   2695,
+   851,
+   2829
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Microdesmidae",
+  "file": "Microdesmidae.webp",
+  "pdf_page": 83,
+  "printed_page": 71,
+  "row": 6,
+  "col": 2,
+  "bbox": [
+   974,
+   2671,
+   1592,
+   2804
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Nomeidae",
+  "file": "Nomeidae.webp",
+  "pdf_page": 83,
+  "printed_page": 71,
+  "row": 6,
+  "col": 3,
+  "bbox": [
+   1734,
+   2632,
+   2349,
+   2882
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Tetragonuridae",
+  "file": "Tetragonuridae.webp",
+  "pdf_page": 84,
+  "printed_page": 72,
+  "row": 1,
+  "col": 1,
+  "bbox": [
+   202,
+   519,
+   813,
+   665
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Achiridae",
+  "file": "Achiridae.webp",
+  "pdf_page": 84,
+  "printed_page": 72,
+  "row": 1,
+  "col": 2,
+  "bbox": [
+   924,
+   371,
+   1549,
+   711
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Tetraodontidae",
+  "file": "Tetraodontidae.webp",
+  "pdf_page": 84,
+  "printed_page": 72,
+  "row": 1,
+  "col": 3,
+  "bbox": [
+   1672,
+   445,
+   2291,
+   713
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Stromateidae",
+  "file": "Stromateidae.webp",
+  "pdf_page": 84,
+  "printed_page": 72,
+  "row": 2,
+  "col": 1,
+  "bbox": [
+   196,
+   936,
+   806,
+   1167
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Cynoglossidae",
+  "file": "Cynoglossidae.webp",
+  "pdf_page": 84,
+  "printed_page": 72,
+  "row": 2,
+  "col": 2,
+  "bbox": [
+   930,
+   907,
+   1544,
+   1204
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Diodontidae",
+  "file": "Diodontidae.webp",
+  "pdf_page": 84,
+  "printed_page": 72,
+  "row": 2,
+  "col": 3,
+  "bbox": [
+   1670,
+   866,
+   2293,
+   1190
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Paralichthyidae",
+  "file": "Paralichthyidae.webp",
+  "pdf_page": 84,
+  "printed_page": 72,
+  "row": 3,
+  "col": 1,
+  "bbox": [
+   188,
+   1440,
+   802,
+   1773
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Balistidae",
+  "file": "Balistidae.webp",
+  "pdf_page": 84,
+  "printed_page": 72,
+  "row": 3,
+  "col": 2,
+  "bbox": [
+   962,
+   1369,
+   1512,
+   1784
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Molidae",
+  "file": "Molidae.webp",
+  "pdf_page": 84,
+  "printed_page": 72,
+  "row": 3,
+  "col": 3,
+  "bbox": [
+   1756,
+   1391,
+   2261,
+   1796
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Bothidae",
+  "file": "Bothidae.webp",
+  "pdf_page": 84,
+  "printed_page": 72,
+  "row": 4,
+  "col": 1,
+  "bbox": [
+   188,
+   1955,
+   810,
+   2328
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Monacanthidae",
+  "file": "Monacanthidae.webp",
+  "pdf_page": 84,
+  "printed_page": 72,
+  "row": 4,
+  "col": 2,
+  "bbox": [
+   918,
+   1878,
+   1532,
+   2270
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Pleuronectidae",
+  "file": "Pleuronectidae.webp",
+  "pdf_page": 84,
+  "printed_page": 72,
+  "row": 5,
+  "col": 1,
+  "bbox": [
+   187,
+   2571,
+   804,
+   2736
+  ],
+  "n_manchas": 1
+ },
+ {
+  "family": "Ostraciidae",
+  "file": "Ostraciidae.webp",
+  "pdf_page": 84,
+  "printed_page": 72,
+  "row": 5,
+  "col": 2,
+  "bbox": [
+   982,
+   2469,
+   1487,
+   2876
+  ],
+  "n_manchas": 1
+ }
+]

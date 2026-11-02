@@ -76,6 +76,7 @@ fun PantallaPregunta(
     tallaMm: Double,
     sesionId: String,
     mesColecta: Int?,
+    familyFilter: Set<String>? = null,
     onAtras: () -> Unit,
     onTerminar: (Identification, List<Observation>, familias: Set<String>?) -> Unit,
     modifier: Modifier = Modifier,
@@ -85,7 +86,7 @@ fun PantallaPregunta(
     val engine = remember(data) { IdentificationEngine(data) }
     val familiasCargadas = remember(data) { data.species.map { it.family }.toSet() }
 
-    var estado by remember { mutableStateOf(EstadoInterrogatorio()) }
+    var estado by remember(familyFilter) { mutableStateOf(EstadoInterrogatorio(familias = familyFilter)) }
     // Un estado completo por cada respuesta, tomado justo antes de
     // incorporarla: "Atras" restaura el ultimo y el motor recalcula
     // exactamente la misma pregunta. Si no queda nada (primera pregunta),
@@ -178,8 +179,8 @@ fun PantallaPregunta(
 
     ContenedorPantalla(modifier) {
         IndicadorFases(pregunta?.fase ?: estado.fase, dimensiones)
-        Text("Quedan ${plausibles.size} candidatos", fontSize = dimensiones.tamanoTextoBase)
-        BotonSecundario(texto = "Atrás", onClick = ::retroceder)
+        Text("${conteo(plausibles.size, "candidate", "candidates")} remaining", fontSize = dimensiones.tamanoTextoBase)
+        BotonSecundario(texto = "Back", onClick = ::retroceder)
 
         if (mostrarIndicador) {
             IndicadorCalculo(dimensiones)
@@ -240,7 +241,7 @@ private data class RespuestaPendiente(
 // ---------------------------------------------------------------- fases
 
 /** Lo que ve el tecnico: tres fases. Miomeros y aletas son las dos mitades de Meristica. */
-private val FASES_VISIBLES = listOf("Forma", "Merística", "Pigmentación")
+private val FASES_VISIBLES = listOf("Body shape", "Meristics", "Pigmentation")
 
 private fun Fase.indiceVisible(): Int = when (this) {
     Fase.FORMA -> 0
@@ -249,8 +250,8 @@ private fun Fase.indiceVisible(): Int = when (this) {
 }
 
 private fun Fase.detalle(): String? = when (this) {
-    Fase.MIOMEROS -> "Primero los segmentos musculares."
-    Fase.ALETAS -> "Ahora aletas y esqueleto, lo que ya esté formado."
+    Fase.MIOMEROS -> "Myomeres first."
+    Fase.ALETAS -> "Now fin rays and skeletal counts, as far as they have formed."
     else -> null
 }
 
@@ -286,7 +287,7 @@ private fun IndicadorCalculo(dimensiones: Dimensiones) {
         horizontalArrangement = Arrangement.spacedBy(dimensiones.espaciado / 2),
     ) {
         CircularProgressIndicator()
-        Text("Calculando...", fontSize = dimensiones.tamanoTextoBase)
+        Text("Calculating...", fontSize = dimensiones.tamanoTextoBase)
     }
 }
 
@@ -310,14 +311,14 @@ private fun PanelPregunta(
             is TipoPregunta.SiNo -> {
                 Text(PROMPTS.getValue(pregunta.clave), fontSize = dimensiones.tamanoTextoBase)
                 BotonPrincipal(
-                    texto = "Sí",
+                    texto = "Present",
                     onClick = { onResponder(listOf(Observation(pregunta.clave, categorical = tipo.valorSi))) },
                 )
                 BotonPrincipal(
-                    texto = "No",
+                    texto = "Absent",
                     onClick = { onResponder(listOf(Observation(pregunta.clave, categorical = tipo.valorNo))) },
                 )
-                BotonSecundario(texto = "No sé / no visible", onClick = noSe)
+                BotonSecundario(texto = "Unknown / not visible", onClick = noSe)
             }
             is TipoPregunta.Opciones -> {
                 Text(PROMPTS.getValue(pregunta.clave), fontSize = dimensiones.tamanoTextoBase)
@@ -326,7 +327,7 @@ private fun PanelPregunta(
                     valores = tipo.valores,
                     onElegir = { onResponder(listOf(Observation(pregunta.clave, categorical = it))) },
                 )
-                BotonSecundario(texto = "No sé / no visible", onClick = noSe)
+                BotonSecundario(texto = "Unknown / not visible", onClick = noSe)
             }
             TipoPregunta.Conteo -> PanelConteo(
                 data, pregunta, familiasPrevias, familiasCargadas, bloqueado, dimensiones, onEditar, onResponder, noSe,
@@ -364,18 +365,18 @@ private fun PanelConteo(
             texto = it
             onEditar()
         },
-        etiqueta = "Conteo",
+        etiqueta = "Count",
         mensajeError = explicarConteo(resultado),
     )
     pregunta.ancla?.let { ancla ->
         VistaPreviaFamilias(data, ancla, valor, familiasPrevias, familiasCargadas, faltaParte = false, dimensiones)
     }
     BotonPrincipal(
-        texto = "Responder",
+        texto = "Submit",
         habilitado = valor != null && !bloqueado,
         onClick = { valor?.let { onResponder(listOf(Observation(pregunta.clave, value = it))) } },
     )
-    BotonSecundario(texto = "No sé / no visible", onClick = noSe, habilitado = !bloqueado)
+    BotonSecundario(texto = "Unknown / not visible", onClick = noSe, habilitado = !bloqueado)
 }
 
 /**
@@ -425,7 +426,7 @@ private fun PanelAleta(
                 textoEspinas = it
                 onEditar()
             },
-            etiqueta = "Espinas",
+            etiqueta = "Spines",
             mensajeError = explicarConteo(resultadoEspinas),
         )
     }
@@ -435,7 +436,7 @@ private fun PanelAleta(
             textoRadios = it
             onEditar()
         },
-        etiqueta = "Radios blandos",
+        etiqueta = "Soft rays",
         mensajeError = explicarConteo(resultadoRadios),
     )
     pregunta.ancla?.let { ancla ->
@@ -447,11 +448,11 @@ private fun PanelAleta(
         )
     }
     BotonPrincipal(
-        texto = "Responder",
+        texto = "Submit",
         habilitado = listo && !bloqueado,
         onClick = { if (listo) onResponder(respuestas) },
     )
-    BotonSecundario(texto = "No sé / no visible", onClick = noSe, habilitado = !bloqueado)
+    BotonSecundario(texto = "Unknown / not visible", onClick = noSe, habilitado = !bloqueado)
 }
 
 /**
@@ -487,8 +488,8 @@ private fun VistaPreviaFamilias(
 
     if (faltaParte) {
         Text(
-            "Para filtrar familias hacen falta los dos números (espinas y radios blandos). " +
-                "Con uno solo, se compara solo contra las especies.",
+            "Filtering by family needs both counts (spines and soft rays). " +
+                "With only one, it is compared against species ranges only.",
             fontSize = dimensiones.tamanoTextoBase,
             fontStyle = FontStyle.Italic,
         )
@@ -497,10 +498,11 @@ private fun VistaPreviaFamilias(
     val e = efecto ?: return
     if (valor == null) return
     Text(
-        "Con este número quedarían ${e.deLaTabla.size} familia(s), de las cuales " +
-            "${e.conEspeciesCargadas.size} tienen especies cargadas." +
+        "With this count, ${conteo(e.deLaTabla.size, "family", "families")} would remain, " +
+            "${e.conEspeciesCargadas.size} of them with species loaded." +
             if (e.noListadasConservadas.isNotEmpty()) {
-                " Además siguen en juego ${e.noListadasConservadas.size} familia(s) cargadas que la tabla no menciona."
+                " Also still in play: ${conteo(e.noListadasConservadas.size, "loaded family", "loaded families")} " +
+                    "not listed in the family table."
             } else {
                 ""
             },
@@ -519,28 +521,28 @@ private fun AvisoFamilias(
     Column(verticalArrangement = Arrangement.spacedBy(dimensiones.espaciado)) {
         if (pendiente.efecto.sinFamiliaCompatible) {
             Text(
-                "Con ese conteo no queda ninguna familia compatible. Esto casi siempre es un " +
-                    "error de conteo, no una especie desconocida.",
+                "No family is compatible with this count. This is almost always a counting " +
+                    "error, not an unknown species.",
                 fontSize = dimensiones.tamanoTextoBase,
                 color = MaterialTheme.colorScheme.error,
             )
-            BotonPrincipal(texto = "Revisar el conteo", onClick = onRevisar)
+            BotonPrincipal(texto = "Recheck the count", onClick = onRevisar)
             // El conteo crudo nunca se pierde: si el tecnico esta seguro, se
             // guarda y se compara contra las especies, solo que no filtra
             // familias.
-            BotonSecundario(texto = "Usarlo sin filtrar familias", onClick = onSoloEspecie)
+            BotonSecundario(texto = "Use it without the family filter", onClick = onSoloEspecie)
         } else {
             // Las familias que quedan SI existen, pero ninguna tiene especies
             // en species.json todavia.
             Text(
-                "Ninguna de las familias compatibles tiene especies en esta versión de la app. " +
-                    "Puedes continuar sin este filtro, o revisar el conteo.",
+                "None of the compatible families has species in this version of the app. " +
+                    "You can continue without this filter or recheck the count.",
                 fontSize = dimensiones.tamanoTextoBase,
                 color = MaterialTheme.colorScheme.error,
             )
-            BotonPrincipal(texto = "Quitar este filtro", onClick = onSoloEspecie)
-            BotonSecundario(texto = "Aplicar de todos modos", onClick = onAplicarDeTodosModos)
-            BotonSecundario(texto = "Revisar el conteo", onClick = onRevisar)
+            BotonPrincipal(texto = "Skip this filter", onClick = onSoloEspecie)
+            BotonSecundario(texto = "Apply anyway", onClick = onAplicarDeTodosModos)
+            BotonSecundario(texto = "Recheck the count", onClick = onRevisar)
         }
     }
 }
@@ -606,7 +608,7 @@ private fun PanelCandidatos(plausibles: List<Candidate>, dimensiones: Dimensione
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(dimensiones.espaciado / 2),
     ) {
-        Text("Candidatos", fontSize = dimensiones.tamanoTextoTitulo, fontWeight = FontWeight.Bold)
+        Text("Candidates", fontSize = dimensiones.tamanoTextoTitulo, fontWeight = FontWeight.Bold)
         // plausibles ya viene ordenado por score descendente (IdentificationEngine.rank).
         for (c in plausibles.take(CANDIDATOS_VISIBLES)) {
             Text(
@@ -616,7 +618,7 @@ private fun PanelCandidatos(plausibles: List<Candidate>, dimensiones: Dimensione
         }
         if (plausibles.size > CANDIDATOS_VISIBLES) {
             Text(
-                "y ${plausibles.size - CANDIDATOS_VISIBLES} más",
+                "and ${plausibles.size - CANDIDATOS_VISIBLES} more",
                 fontSize = dimensiones.tamanoTextoBase,
                 fontStyle = FontStyle.Italic,
             )

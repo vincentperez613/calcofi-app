@@ -5,65 +5,93 @@ import cal.cofi.atlas.AtlasData
 import cal.cofi.atlas.CHARACTER_CLASS
 import cal.cofi.atlas.NUNCA_SE_PREGUNTAN
 import cal.cofi.atlas.ReglasInterrogatorio
+import cal.cofi.atlas.Stage
 import cal.cofi.atlas.claveCanonica
 
 /**
- * Como se le pide cada caracter al tecnico, portado de identify.py (PROMPTS).
- * Nunca se muestra el nombre tecnico del caracter (myomeres_total, etc.) en
- * la UI. Las aletas con espinas no estan aca sino en [PROMPTS_ALETA]: se
- * piden espinas y radios blandos juntos, en una sola pregunta por aleta.
+ * Como se le pide cada caracter al tecnico, con la terminologia del atlas
+ * (miomeros preanales, insercion de la dorsal, espina hemal). La UI va en
+ * ingles, igual que el texto del atlas que muestra al lado. Nunca se
+ * muestra la clave cruda del caracter (myomeres_total, etc.). Las aletas con
+ * espinas no estan aca sino en [PROMPTS_ALETA]: se piden espinas y radios
+ * blandos juntos, en una sola pregunta por aleta.
  *
  * Sin redaccion, a proposito: "Myomeres: Precaudal"/"Caudal". El limite
  * entre miomeros precaudales y caudales es el de las vertebras (la primera
  * con espina hemal), que en una larva no se ve; no es el ano (eso seria
- * preanal/postanal). Estan clasificados, pero sin forma llana de pedirlos.
+ * preanal/postanal). Estan clasificados, pero no hay forma de pedirlos que
+ * se pueda verificar en una larva.
+ *
+ * D_insertion_over_A_ray es la INSERCION de la dorsal (el extremo posterior
+ * de su base), no su origen: el atlas dice "D insertion above A ray 5-7".
  */
 val PROMPTS: Map<String, String> = mapOf(
     "myomeres_total" to
-        "Cuenta los segmentos musculares en V a lo largo de todo el cuerpo, " +
-        "de la cabeza a la cola.",
+        "Count total myomeres (preanal + postanal).",
     "myomeres_preanal" to
-        "Cuenta los segmentos musculares desde la cabeza hasta el ano.",
+        "Count preanal myomeres (anterior to the anus).",
     "D_insertion_over_A_ray" to
-        "Ubica donde empieza la aleta de arriba (dorsal). Contando los radios " +
-        "de la aleta de abajo (anal) desde el frente, ¿sobre cual queda?",
+        "Locate the dorsal-fin insertion (posterior end of the dorsal-fin base). " +
+        "Counting anal-fin rays from the anal-fin origin, above which ray does it lie?",
     "hindgut_pigment" to
-        "¿Ves manchas negras sobre la parte final del intestino, del lado de arriba?",
+        "Melanophores on the dorsal surface of the hindgut:",
     "Vertebrae: Precaudal" to
-        "Cuenta las vertebras desde la cabeza hasta la primera con espina hemal.",
+        "Count precaudal vertebrae (anterior to the first vertebra bearing a haemal spine).",
     "Vertebrae: Total" to
-        "Cuenta todas las vertebras.",
+        "Count total vertebrae.",
     "Branchiostegals" to
-        "Cuenta los radios branquiostegos bajo la mandibula.",
+        "Count branchiostegal rays (one side).",
     "Dorsal finlets" to
-        "Cuenta las aletillas sueltas que hay entre la aleta de arriba (dorsal) y la cola.",
+        "Count dorsal finlets (between the dorsal fin and the caudal fin).",
     "Anal finlets" to
-        "Cuenta las aletillas sueltas que hay entre la aleta de abajo (anal) y la cola.",
+        "Count anal finlets (between the anal fin and the caudal fin).",
     "Caudal: Total" to
-        "Cuenta todos los radios de la aleta de la cola.",
+        "Count total caudal-fin rays (principal + procurrent).",
 )
 
 /**
  * Una pregunta por aleta, con dos campos: espinas y radios blandos (ver
- * Aleta en Engine.kt). La explicacion de que es cada cosa va en
+ * Aleta en Engine.kt). "Rays" en el sentido meristico: espinas y radios
+ * blandos juntos. La explicacion de que es cada cosa va en
  * [AYUDA_ESPINAS_Y_RADIOS], comun a todas.
  */
 val PROMPTS_ALETA: Map<String, String> = mapOf(
-    "anal" to "Cuenta los elementos de la aleta de abajo, la que está detrás del ano (anal).",
-    "dorsal" to "Cuenta los elementos de la aleta de arriba (dorsal).",
-    "pelvica" to "Cuenta los elementos de una de las aletas de abajo, cerca del vientre (pélvicas).",
-    "pectoral" to "Cuenta los elementos de una de las aletas del costado, detrás de la cabeza (pectorales).",
+    "anal" to "Count anal-fin rays.",
+    "dorsal" to "Count dorsal-fin rays.",
+    "pelvica" to "Count pelvic-fin rays (one side).",
+    "pectoral" to "Count pectoral-fin rays (one side).",
 )
 
 /**
  * El atlas escribe las espinas en romanos ("III", "I,5"); el tecnico escribe
- * numeros normales. Lo de "pon 0" importa: sin espinas no es lo mismo que no
- * saber.
+ * numeros arabigos. Lo de "Enter 0" importa: sin espinas no es lo mismo que
+ * no saber.
  */
 const val AYUDA_ESPINAS_Y_RADIOS =
-    "Espinas: las duras y lisas, sin divisiones. Radios blandos: los flexibles, " +
-        "divididos en segmentos. Escribe números normales (3, no III). Si no tiene " +
-        "espinas, pon 0. Si no distingues una cosa de la otra, deja ese campo vacío."
+    "Spines: unsegmented and unbranched. Soft rays: segmented, often branched. " +
+        "Enter Arabic numerals (3, not III). Enter 0 if there are no spines. " +
+        "Leave a field blank if spines and soft rays cannot be told apart."
+
+/**
+ * Nombre de cada etapa como lo escribe el atlas, para captura e historial.
+ * Las sesiones guardan el nombre del enum ("POF"): ver [nombreEtapaGuardada].
+ */
+fun nombreEtapa(etapa: Stage): String = when (etapa) {
+    Stage.EGG -> "Egg"
+    Stage.YS -> "Yolk-sac"
+    Stage.PRF -> "Preflexion"
+    Stage.F -> "Flexion"
+    Stage.POF -> "Postflexion"
+    Stage.TR -> "Transformation"
+    Stage.JUV -> "Juvenile"
+}
+
+/** Para el historial: el nombre del enum guardado, o tal cual si no se reconoce. */
+fun nombreEtapaGuardada(guardada: String): String =
+    Stage.entries.firstOrNull { it.name == guardada }?.let(::nombreEtapa) ?: guardada
+
+/** "1 family", "3 families": los textos de conteo, sin el "(s)" de antes. */
+fun conteo(n: Int, singular: String, plural: String): String = "$n ${if (n == 1) singular else plural}"
 
 /**
  * Una opcion de una pregunta categorica de mas de dos valores (p.ej. una
@@ -77,8 +105,9 @@ data class OpcionLlana(val valor: String, val texto: String)
  * Catalogo de opciones por caracter, en el orden en que se muestran. Vacio
  * por ahora: todavia no esta decidido de donde salen las categorias de forma
  * ni sus valores por especie, y el bundle no trae ningun caracter "shape".
- * Cuando lleguen, cada caracter necesita aqui TODAS sus opciones con texto
- * llano (y su pregunta en PROMPTS); si falta alguna, el motor no lo pregunta.
+ * Cuando lleguen, cada caracter necesita aqui TODAS sus opciones con su
+ * texto (y su pregunta en PROMPTS y su nombre corto en ETIQUETAS); si falta
+ * alguna opcion, el motor no lo pregunta.
  */
 val OPCIONES_CATEGORICAS: Map<String, List<OpcionLlana>> = emptyMap()
 
@@ -93,18 +122,34 @@ val REGLAS_APP: ReglasInterrogatorio = ReglasInterrogatorio(
 )
 
 /**
- * Nombres cortos de las partes de una aleta, para las vistas de auditoria
- * (resultado, historial): ahi se lista cada caracter por separado.
+ * Nombre corto de cada caracter, para las vistas de auditoria (resultado,
+ * historial, catalogo): ahi se lista cada caracter por separado y la
+ * pregunta completa de [PROMPTS] seria ruido. Cubre todo lo preguntable y
+ * las claves del motor que no son texto del atlas; las claves de la tabla
+ * MERISTICS ("Gill rakers: Lower") ya vienen en la terminologia del atlas
+ * y se muestran tal cual.
  */
-private val ETIQUETAS_ALETA: Map<String, String> = mapOf(
-    "Anal spines" to "Espinas de la aleta de abajo (anal)",
-    "Anal rays" to "Radios blandos de la aleta de abajo (anal)",
-    "Dorsal spines" to "Espinas de la aleta de arriba (dorsal)",
-    "Dorsal rays" to "Radios blandos de la aleta de arriba (dorsal)",
-    "Pelvic spines" to "Espinas de la aleta pélvica",
-    "Pelvic" to "Radios blandos de la aleta pélvica",
-    "Pectoral spines" to "Espinas de la aleta pectoral",
-    "Pectoral" to "Radios blandos de la aleta pectoral",
+private val ETIQUETAS: Map<String, String> = mapOf(
+    "myomeres_total" to "Total myomeres",
+    "myomeres_preanal" to "Preanal myomeres",
+    "myomeres_postanal" to "Postanal myomeres",
+    "D_insertion_over_A_ray" to "Dorsal-fin insertion above anal-fin ray",
+    "D_insertion_postanal_myomere" to "Dorsal-fin insertion above postanal myomere",
+    "hindgut_pigment" to "Dorsal hindgut pigment",
+    "Vertebrae: Precaudal" to "Precaudal vertebrae",
+    "Vertebrae: Total" to "Total vertebrae",
+    "Branchiostegals" to "Branchiostegal rays",
+    "Dorsal finlets" to "Dorsal finlets",
+    "Anal finlets" to "Anal finlets",
+    "Caudal: Total" to "Total caudal-fin rays",
+    "Anal spines" to "Anal-fin spines",
+    "Anal rays" to "Anal-fin soft rays",
+    "Dorsal spines" to "Dorsal-fin spines",
+    "Dorsal rays" to "Dorsal-fin soft rays",
+    "Pelvic spines" to "Pelvic-fin spines",
+    "Pelvic" to "Pelvic-fin soft rays",
+    "Pectoral spines" to "Pectoral-fin spines",
+    "Pectoral" to "Pectoral-fin soft rays",
 )
 
 /**
@@ -114,31 +159,36 @@ private val ETIQUETAS_ALETA: Map<String, String> = mapOf(
  * historial no muestre la clave cruda; nunca se usan para preguntar.
  */
 private val ETIQUETAS_HISTORICAS: Map<String, String> = mapOf(
-    "vertebrae_total" to "Segmentos musculares o vértebras, total (filtro por familia)",
-    "anal_rays_total" to "Aleta de abajo (anal), espinas y radios juntos (filtro por familia)",
-    "dorsal_rays_total" to "Aleta de arriba (dorsal), espinas y radios juntos (filtro por familia)",
-    "Sn-A/BL" to "Del hocico al ano / talla",
-    "BD/BL" to "Altura máxima del cuerpo / talla",
-    "HL/BL" to "Largo de la cabeza / talla",
-    "P1L/BL" to "Largo de la aleta pectoral / talla",
-    "P2L/BL" to "Largo de la aleta pélvica / talla",
-    "HW/HL" to "Ancho de la cabeza / largo de la cabeza",
-    "SnL/HL" to "Largo del hocico / largo de la cabeza",
-    "ED/HL" to "Diámetro del ojo / largo de la cabeza",
+    "vertebrae_total" to "Total myomeres or vertebrae (family filter)",
+    "anal_rays_total" to "Anal-fin spines + soft rays (family filter)",
+    "dorsal_rays_total" to "Dorsal-fin spines + soft rays (family filter)",
+    "Sn-A/BL" to "Snout–anus length / BL",
+    "BD/BL" to "Body depth / BL",
+    "HL/BL" to "Head length / BL",
+    "P1L/BL" to "Pectoral-fin length / BL",
+    "P2L/BL" to "Pelvic-fin length / BL",
+    "HW/HL" to "Head width / HL",
+    "SnL/HL" to "Snout length / HL",
+    "ED/HL" to "Eye diameter / HL",
 )
 
 /**
- * Traduce un caracter tecnico a su redaccion, o lo deja tal cual si no hay
- * redaccion todavia. Usado en vistas de auditoria (resultado, historial)
- * donde mostrar la clave cruda es mejor que ocultar el caracter — a
- * diferencia de PantallaPregunta, que nunca debe mostrarle jerga al tecnico
- * en el momento de preguntar.
+ * El nombre corto de un caracter, o la clave tal cual si no tiene. Usado en
+ * vistas de auditoria (resultado, historial, catalogo), donde mostrar la
+ * clave cruda es mejor que ocultar el caracter. PantallaPregunta no pasa
+ * por aca: pregunta con [PROMPTS].
  */
 fun traducirCaracter(character: String): String =
-    ETIQUETAS_ALETA[character]
-        ?: PROMPTS[claveCanonica(character)]
+    ETIQUETAS[claveCanonica(character)]
         ?: ETIQUETAS_HISTORICAS[character]
         ?: character
+
+/**
+ * Si [character] tiene nombre corto propio. No basta con comparar
+ * traducirCaracter contra la clave: en ingles el nombre puede coincidir con
+ * la clave del atlas ("Dorsal finlets") y aun asi estar puesto a proposito.
+ */
+internal fun tieneEtiqueta(character: String): Boolean = claveCanonica(character) in ETIQUETAS
 
 /**
  * Caracteres presentes en el dataset (meristics + diagnostic de todas las

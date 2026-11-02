@@ -53,11 +53,13 @@ private data class FigureDto(
     val plate: String,
     val box: List<Int>,
     val size_mm: Double? = null,
+    val size_label: String? = null,
     val stage: String? = null,
     val stage_source: String? = null,
     val caption_taxon: String? = null,
     val species: String? = null,
     val uncertain: Boolean = false,
+    val needs_review: Boolean = false,
 )
 
 private val json = Json { ignoreUnknownKeys = true }
@@ -122,11 +124,13 @@ object AtlasLoader {
                     plate = it.plate,
                     box = it.box,
                     sizeMm = it.size_mm,
+                    sizeLabel = it.size_label,
                     stage = Stage.fromCode(it.stage),
                     stageSource = it.stage_source,
                     captionTaxon = it.caption_taxon,
                     species = it.species,
                     uncertain = it.uncertain,
+                    needsReview = it.needs_review,
                 )
             }
 

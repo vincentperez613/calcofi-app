@@ -32,12 +32,12 @@ fun PantallaPrueba() {
             fontSize = dimensiones.tamanoTextoBase,
         )
 
-        BotonPrincipal(texto = "Boton principal", onClick = {})
-        BotonSecundario(texto = "Boton secundario", onClick = {})
+        BotonPrincipal(texto = "Primary button", onClick = {})
+        BotonSecundario(texto = "Secondary button", onClick = {})
         CampoNumerico(
             valor = talla,
             onValorCambia = { talla = it },
-            etiqueta = "Talla (mm)",
+            etiqueta = "Body length, BL (mm)",
         )
     }
 }
