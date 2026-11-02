@@ -1,9 +1,12 @@
 package cal.cofi.atlas.ui
 
+import cal.cofi.atlas.Distribucion
 import cal.cofi.atlas.EvaluacionRiesgo
 import cal.cofi.atlas.Identification
+import cal.cofi.atlas.NivelRiesgo
 import cal.cofi.atlas.Observation
 import cal.cofi.atlas.Stage
+import cal.cofi.atlas.Temporada
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
@@ -212,7 +215,7 @@ object Almacen {
     /** Una fila por sesion; las observaciones van en una columna por caracter distinto. */
     fun exportarCsv(): String {
         val sesiones = listar()
-        return AlmacenamientoPlataforma.compartirCsv(construirCsv(sesiones), "calcofilarvas_sesiones.csv")
+        return AlmacenamientoPlataforma.compartirCsv(construirCsv(sesiones), "calcofilarvae_sessions.csv")
     }
 }
 
@@ -226,6 +229,33 @@ private fun CandidatoGuardado.conRiesgo(evaluacion: EvaluacionRiesgo?): Candidat
     )
 
 private const val BOM_UTF8 = "﻿"
+
+/**
+ * Las sesiones guardan los enums de Riesgo.kt por nombre ("ALTO", "FUERA");
+ * el CSV los saca en ingles, como el resto de la UI. El JSON guardado no
+ * cambia. Un nombre que no se reconoce sale tal cual.
+ */
+private val CSV_NIVEL = mapOf(
+    NivelRiesgo.BAJO to "low",
+    NivelRiesgo.MEDIO to "medium",
+    NivelRiesgo.ALTO to "high",
+    NivelRiesgo.NO_EVALUABLE to "not_assessable",
+)
+private val CSV_TEMPORADA = mapOf(
+    Temporada.PICO to "peak",
+    Temporada.EN_TEMPORADA to "in_season",
+    Temporada.CONTIGUO to "adjacent",
+    Temporada.FUERA to "out_of_season",
+    Temporada.SIN_DATO to "no_data",
+)
+private val CSV_DISTRIBUCION = mapOf(
+    Distribucion.SI to "yes",
+    Distribucion.NO to "no",
+    Distribucion.NO_SE to "unknown",
+)
+
+private fun aCsv(guardado: String?, valores: Map<out Enum<*>, String>): String =
+    guardado?.let { g -> valores.entries.firstOrNull { it.key.name == g }?.value ?: g } ?: ""
 
 internal fun construirCsv(sesiones: List<SesionGuardada>): String {
     // Columnas por caracter, no por posicion (Obs1, Obs2, ...): el orden
@@ -242,12 +272,12 @@ internal fun construirCsv(sesiones: List<SesionGuardada>): String {
     // Las columnas nuevas van despues de las que ya existian, para no
     // correr de lugar las que alguien ya este leyendo por posicion.
     val encabezados = listOf(
-        "id", "fecha_hora", "talla_mm", "etapa", "resultado_label", "resultado_nivel",
-        "top1_especie", "top1_score", "top2_especie", "top2_score", "top3_especie", "top3_score",
-        "mes_colecta", "zona_colecta",
+        "id", "datetime", "body_length_mm", "stage", "result_label", "result_level",
+        "top1_species", "top1_score", "top2_species", "top2_score", "top3_species", "top3_score",
+        "collection_month", "collection_locality",
     ) + (1..3).flatMap { n ->
-        listOf("top${n}_riesgo", "top${n}_temporada", "top${n}_distribucion", "top${n}_razones_riesgo")
-    } + caracteres + caracteresRazon.flatMap { listOf("${it}_numerador_mm", "${it}_denominador_mm") }
+        listOf("top${n}_risk", "top${n}_season", "top${n}_in_range", "top${n}_risk_reasons")
+    } + caracteres + caracteresRazon.flatMap { listOf("${it}_numerator_mm", "${it}_denominator_mm") }
 
     val filas = sesiones.map { sesion ->
         val top = sesion.resultado?.top3.orEmpty()
@@ -269,7 +299,12 @@ internal fun construirCsv(sesiones: List<SesionGuardada>): String {
         )
         val riesgo = (0..2).flatMap { i ->
             val c = top.getOrNull(i)
-            listOf(c?.riesgo ?: "", c?.temporada ?: "", c?.distribucion ?: "", c?.razonesRiesgo?.joinToString(" ") ?: "")
+            listOf(
+                aCsv(c?.riesgo, CSV_NIVEL),
+                aCsv(c?.temporada, CSV_TEMPORADA),
+                aCsv(c?.distribucion, CSV_DISTRIBUCION),
+                c?.razonesRiesgo?.joinToString(" ") ?: "",
+            )
         }
         // Si un caracter se respondio dos veces (el tecnico uso "Atras" y
         // contesto de nuevo), gana la ultima respuesta.
@@ -280,7 +315,7 @@ internal fun construirCsv(sesiones: List<SesionGuardada>): String {
                 o == null -> ""
                 o.valor != null -> o.valor.toString()
                 o.categorico != null -> o.categorico
-                else -> "no se"
+                else -> "unknown"
             }
         }
         val crudasRazon = caracteresRazon.flatMap { clave ->

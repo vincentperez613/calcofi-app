@@ -245,7 +245,7 @@ class IdentificationEngine(private val data: AtlasData) {
     ): Identification {
         val ranked = rank(stage, obs, familyFilter, tallaMm)
         if (ranked.isEmpty()) {
-            return Identification("sin datos", TaxonLevel.UNRESOLVED, emptyList())
+            return Identification("no data", TaxonLevel.UNRESOLVED, emptyList())
         }
 
         // El titular se decide sobre los candidatos SIN contradicciones, no

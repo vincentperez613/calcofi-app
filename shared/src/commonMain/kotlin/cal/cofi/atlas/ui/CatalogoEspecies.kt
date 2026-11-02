@@ -19,6 +19,8 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -83,7 +85,11 @@ private val familiasEquivalentes = mapOf(
 )
 
 @Composable
-internal fun CatalogoEspecies(data: AtlasData, modifier: Modifier = Modifier) {
+internal fun CatalogoEspecies(
+    data: AtlasData,
+    modifier: Modifier = Modifier,
+    onIdentifyFamily: (String) -> Unit = {},
+) {
     val dimensiones = LocalDimensiones.current
     val ancho = LocalAncho.current
     val familias = remember(data) {
@@ -107,7 +113,7 @@ internal fun CatalogoEspecies(data: AtlasData, modifier: Modifier = Modifier) {
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            errorCarga = e.message ?: "error desconocido"
+            errorCarga = e.message ?: "unknown error"
         }
     }
 
@@ -141,7 +147,7 @@ internal fun CatalogoEspecies(data: AtlasData, modifier: Modifier = Modifier) {
                 data = data,
                 especie = especieSeleccionada,
                 dimensiones = dimensiones,
-                textoVolverArriba = "Volver al catálogo",
+                textoVolverArriba = "Back to catalog",
                 onVolver = { especieSeleccionadaId = null },
             )
         }
@@ -171,31 +177,30 @@ internal fun CatalogoEspecies(data: AtlasData, modifier: Modifier = Modifier) {
                 modifier = Modifier.padding(dimensiones.espaciado),
                 verticalArrangement = Arrangement.spacedBy(dimensiones.espaciado / 2),
             ) {
-                TituloPantalla("Especies")
+                TituloPantalla("Species")
                 Text(
-                    buildString {
-                        append("${data.species.size} especies en ${familias.size} familias")
-                    },
+                    "${conteo(data.species.size, "species", "species")} in " +
+                        conteo(familias.size, "family", "families"),
                     fontSize = dimensiones.tamanoTextoBase,
                 )
                 when {
                     errorCarga != null -> Text(
-                        "No se pudo cargar el índice de imágenes de familias: $errorCarga",
+                        "Could not load the family image index: $errorCarga",
                         color = MaterialTheme.colorScheme.error,
                         fontSize = dimensiones.tamanoTextoBase,
                     )
                     imagenesFamilias == null -> Text(
-                        "Cargando imágenes de familias...",
+                        "Loading family images...",
                         fontSize = dimensiones.tamanoTextoBase,
                     )
                 }
                 CampoTexto(
                     valor = texto,
                     onValorCambia = { texto = sanitizarBusqueda(it) },
-                    etiqueta = "Buscar especie, género o familia",
+                    etiqueta = "Search species, genus or family",
                 )
                 if (texto.isNotEmpty()) {
-                    BotonSecundario(texto = "Limpiar búsqueda", onClick = { texto = "" })
+                    BotonSecundario(texto = "Clear search", onClick = { texto = "" })
                 }
             }
 
@@ -204,8 +209,8 @@ internal fun CatalogoEspecies(data: AtlasData, modifier: Modifier = Modifier) {
                     modifier = Modifier.padding(horizontal = dimensiones.espaciado),
                     verticalArrangement = Arrangement.spacedBy(dimensiones.espaciado),
                 ) {
-                    Text("Sin resultados para «$consultaAplicada».", fontSize = dimensiones.tamanoTextoBase)
-                    BotonSecundario(texto = "Limpiar búsqueda", onClick = { texto = "" })
+                    Text("No results for “$consultaAplicada”.", fontSize = dimensiones.tamanoTextoBase)
+                    BotonSecundario(texto = "Clear search", onClick = { texto = "" })
                 }
             } else {
                 LazyVerticalGrid(
@@ -244,6 +249,7 @@ internal fun CatalogoEspecies(data: AtlasData, modifier: Modifier = Modifier) {
                                     }
                                 },
                                 onEspecieClick = { especieSeleccionadaId = it.id },
+                                onIdentifyFamily = onIdentifyFamily,
                             )
                         }
                     }
@@ -288,6 +294,7 @@ private fun TarjetaFamiliaIndice(
     dimensiones: Dimensiones,
     onClick: () -> Unit,
     onEspecieClick: (Species) -> Unit,
+    onIdentifyFamily: (String) -> Unit,
 ) {
     val forma = RoundedCornerShape(dimensiones.espaciado / 2)
     Column(
@@ -321,7 +328,7 @@ private fun TarjetaFamiliaIndice(
                         mantenerProporcion = false,
                     )
                 } else {
-                    Text("Sin imagen", fontSize = dimensiones.tamanoTextoBase * 0.75f)
+                    Text("No image", fontSize = dimensiones.tamanoTextoBase * 0.75f)
                 }
             }
             Row(
@@ -356,6 +363,23 @@ private fun TarjetaFamiliaIndice(
                         especie = especie,
                         dimensiones = dimensiones,
                         onClick = { onEspecieClick(especie) },
+                    )
+                }
+                TextButton(
+                    onClick = { onIdentifyFamily(familia) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(36.dp),
+                    colors = ButtonDefaults.textButtonColors(
+                        containerColor = Color(0xFF7062A4),
+                        contentColor = Color.White,
+                    ),
+                    shape = RoundedCornerShape(dimensiones.espaciado / 3),
+                ) {
+                    Text(
+                        text = "Identify",
+                        fontSize = dimensiones.tamanoTextoBase * 0.85f,
+                        fontWeight = FontWeight.Medium,
                     )
                 }
             }
@@ -405,7 +429,7 @@ internal fun ImagenEspecie(
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            EstadoImagenEspecie.Error(e.message ?: "error desconocido")
+            EstadoImagenEspecie.Error(e.message ?: "unknown error")
         }
     }
 

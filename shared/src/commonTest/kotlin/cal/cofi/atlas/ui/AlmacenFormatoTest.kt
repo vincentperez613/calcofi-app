@@ -63,16 +63,16 @@ class AlmacenFormatoTest {
         val fila = lineas[1].split(",")
         fun columna(nombre: String) = fila[encabezados.indexOf(nombre).also { assertTrue(it >= 0, "falta $nombre") }]
 
-        assertEquals("2.024", columna("BD/BL_numerador_mm"))
-        assertEquals("18.4", columna("BD/BL_denominador_mm"))
+        assertEquals("2.024", columna("BD/BL_numerator_mm"))
+        assertEquals("18.4", columna("BD/BL_denominator_mm"))
         assertEquals("11.0", columna("BD/BL"))
         assertEquals("45.0", columna("vertebrae_total"))
-        assertEquals("no se", columna("myomeres_preanal"))
+        assertEquals("unknown", columna("myomeres_preanal"))
         // Las columnas nuevas existen, vacias para una sesion de antes.
-        assertEquals("", columna("mes_colecta"))
-        assertEquals("", columna("top1_riesgo"))
+        assertEquals("", columna("collection_month"))
+        assertEquals("", columna("top1_risk"))
         // Las de siempre no cambiaron de lugar.
-        assertEquals(listOf("id", "fecha_hora", "talla_mm", "etapa"), encabezados.take(4))
+        assertEquals(listOf("id", "datetime", "body_length_mm", "stage"), encabezados.take(4))
         assertEquals("top3_score", encabezados[11])
     }
 
@@ -86,13 +86,14 @@ class AlmacenFormatoTest {
                 listOf(
                     CandidatoGuardado(
                         "Anchoa compressa", 100, riesgo = "ALTO", temporada = "FUERA", distribucion = "NO_SE",
-                        razonesRiesgo = listOf("Colectada en enero: fuera de la temporada de desove (junio, julio, agosto)."),
+                        razonesRiesgo = listOf("Collected in January: outside the spawning season (June, July, August)."),
                     ),
                 ),
             ),
         )
         val csv = construirCsv(listOf(codificarSesiones(listOf(sesion)).let(::decodificarSesiones).single()))
-        assertTrue("ALTO,FUERA,NO_SE" in csv, csv)
+        // Los enums guardados ("ALTO", "FUERA", "NO_SE") salen en ingles.
+        assertTrue("high,out_of_season,unknown" in csv, csv)
         // La zona lleva coma: tiene que ir entre comillas para no correr columnas.
         assertTrue("\"Ensenada, B.C.\"" in csv, csv)
     }

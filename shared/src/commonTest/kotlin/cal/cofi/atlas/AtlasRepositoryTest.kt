@@ -52,8 +52,8 @@ class AtlasRepositoryTest {
     fun cargaMetadatosDeFigurasDelBundle() = runTest {
         val listo = assertIs<EstadoCarga.Listo>(AtlasRepository().cargar())
 
-        assertTrue(listo.data.figures.any { it.sizeLabel != null }, "faltan tallas de figuras")
-        assertTrue(listo.data.figures.any { it.needsReview }, "faltan estados de revisión de figuras")
+        assertTrue(listo.data.figures.any { it.sizeLabel != null }, "figure size labels are missing")
+        assertTrue(listo.data.figures.any { it.needsReview }, "figure review flags are missing")
     }
 
     @Test

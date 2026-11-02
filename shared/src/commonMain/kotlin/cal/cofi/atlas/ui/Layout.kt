@@ -289,7 +289,7 @@ fun BotonSeleccionable(
 /**
  * Tarjeta de opcion con dibujo arriba y texto abajo: la de las etapas de
  * PantallaCaptura y la de las preguntas de opciones (p.ej. forma del
- * cuerpo). El tecnico elige viendo el dibujo, no leyendo un termino.
+ * cuerpo). El dibujo acompaña al termino para confirmar la eleccion.
  * [dibujo] recibe el color a usar (resaltado si esta seleccionada) y el
  * tamaño que le toca.
  */
@@ -330,6 +330,10 @@ fun TarjetaIlustrada(
  * [CampoNumerico], sin teclado decimal ni [mensajeError]: la sanitizacion de
  * lo que se escribe aca (limite de largo, caracteres de control) vive en
  * quien lo usa, no en este componente generico.
+ *
+ * [ejemplo] es el placeholder: que tipo de texto se espera. Con [etiqueta]
+ * presente, Material3 solo lo muestra con el campo enfocado y vacio (sin
+ * foco, la etiqueta ocupa ese lugar).
  */
 @Composable
 fun CampoTexto(
@@ -337,12 +341,14 @@ fun CampoTexto(
     onValorCambia: (String) -> Unit,
     modifier: Modifier = Modifier,
     etiqueta: String? = null,
+    ejemplo: String? = null,
 ) {
     val dimensiones = LocalDimensiones.current
     OutlinedTextField(
         value = valor,
         onValueChange = onValorCambia,
         label = etiqueta?.let { texto -> { Text(texto, fontSize = dimensiones.tamanoTextoBase) } },
+        placeholder = ejemplo?.let { texto -> { Text(texto, fontSize = dimensiones.tamanoTextoBase) } },
         textStyle = TextStyle(fontSize = dimensiones.tamanoTextoBase),
         singleLine = true,
         modifier = modifier

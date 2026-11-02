@@ -10,7 +10,9 @@ import java.util.Locale
 actual object AlmacenamientoPlataforma {
     // Home del usuario, no "junto al ejecutable": donde corre desde el IDE
     // o desde un jar empaquetado, la ruta del ejecutable no es confiable,
-    // y el home siempre existe y es escribible.
+    // y el home siempre existe y es escribible. Conserva el nombre de antes
+    // de que la app se llamara CalcofiLarvae: cambiarlo dejaria el
+    // historial guardado atras.
     private val directorio: File by lazy {
         File(System.getProperty("user.home"), ".calcofilarvas").apply { mkdirs() }
     }
@@ -31,19 +33,19 @@ actual object AlmacenamientoPlataforma {
         // FileDialog.SAVE es el dialogo de guardar nativo del sistema
         // operativo; bloquea el hilo llamador hasta que se cierra, que es
         // el comportamiento esperado para un dialogo modal como este.
-        val dialogo = FileDialog(null as Frame?, "Guardar CSV", FileDialog.SAVE)
+        val dialogo = FileDialog(null as Frame?, "Save CSV", FileDialog.SAVE)
         dialogo.file = nombreArchivo
         dialogo.isVisible = true
 
         val directorioElegido = dialogo.directory
         val archivoElegido = dialogo.file
         if (directorioElegido == null || archivoElegido == null) {
-            return "Exportación cancelada."
+            return "Export canceled."
         }
 
         val destino = File(directorioElegido, archivoElegido)
         destino.writeText(contenido, Charsets.UTF_8)
-        return "Guardado en: ${destino.absolutePath}"
+        return "Saved to: ${destino.absolutePath}"
     }
 
     actual fun ahoraIso(): String =

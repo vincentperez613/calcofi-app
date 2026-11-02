@@ -51,6 +51,7 @@ private data class DatosPregunta(
     val sesionId: String,
     val mesColecta: Int?,
     val zonaColecta: String?,
+    val familyFilter: Set<String>?,
 )
 
 private data class DatosResultado(
@@ -78,8 +79,8 @@ fun App() {
             LaunchedEffect(repositorio) { repositorio.cargar() }
 
             when (val estado = estadoCarga) {
-                is EstadoCarga.Cargando -> MensajeCentrado("Cargando atlas...")
-                is EstadoCarga.Error -> MensajeCentrado("Error al cargar el atlas: ${estado.mensaje}")
+                is EstadoCarga.Cargando -> MensajeCentrado("Loading atlas...")
+                is EstadoCarga.Error -> MensajeCentrado("Failed to load the atlas: ${estado.mensaje}")
                 is EstadoCarga.Listo -> AppConNavegacion(estado.data)
             }
         }
@@ -87,20 +88,22 @@ fun App() {
 }
 
 /**
- * Dueno de la seccion activa (Analisis / Especies / Historial) y de la barra que la
+ * Dueno de la seccion activa (Analisis / Historial) y de la barra que la
  * elige: NavigationRail a la izquierda en AMPLIO, NavigationBar abajo en
  * COMPACTO/MEDIO. Las pantallas no conocen esta navegacion.
  *
- * Las secciones quedan SIEMPRE compuestas como hermanos dentro de un Box,
- * alternando solo su tamano (0.dp vs fillMaxSize) segun la seccion activa.
- * Un if/when que solo compusiera la pantalla activa destruiria el remember
- * de las demas — y perder el progreso a mitad de una identificacion es
- * justo lo que no se puede permitir en campo.
+ * FlujoAnalisis y PantallaHistorial quedan SIEMPRE compuestos como
+ * hermanos dentro de un Box, alternando solo su tamano (0.dp vs
+ * fillMaxSize) segun la seccion activa. Si en cambio se gatearan con un
+ * if/when sobre la llamada al composable, cambiar de seccion destruiria
+ * el remember de la que quedo afuera — y perder el progreso a mitad de
+ * una identificacion es justo lo que no se puede permitir en campo.
  */
 @Composable
 private fun AppConNavegacion(data: AtlasData) {
     val ancho = LocalAncho.current
     var seccion by remember { mutableStateOf(Seccion.ANALISIS) }
+    var familiaIdentificar by remember { mutableStateOf<String?>(null) }
 
     // El inset va aca, no en el Row/Column de afuera: NavigationBar y
     // NavigationRail ya insetean sus propios bordes contra las barras del
@@ -110,10 +113,17 @@ private fun AppConNavegacion(data: AtlasData) {
     val contenido: @Composable () -> Unit = {
         Box(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.statusBars)) {
             Box(if (seccion == Seccion.ANALISIS) Modifier.fillMaxSize() else Modifier.size(0.dp)) {
-                FlujoAnalisis(data)
+                FlujoAnalisis(data = data, familiaInicial = familiaIdentificar)
             }
             Box(if (seccion == Seccion.ESPECIES) Modifier.fillMaxSize() else Modifier.size(0.dp)) {
-                PantallaEspecies(data = data)
+                PantallaEspecies(
+                    data = data,
+                    activa = seccion == Seccion.ESPECIES,
+                    onIdentifyFamily = { familia ->
+                        familiaIdentificar = familia
+                        seccion = Seccion.ANALISIS
+                    },
+                )
             }
             Box(if (seccion == Seccion.HISTORIAL) Modifier.fillMaxSize() else Modifier.size(0.dp)) {
                 PantallaHistorial(activa = seccion == Seccion.HISTORIAL)
@@ -123,13 +133,19 @@ private fun AppConNavegacion(data: AtlasData) {
 
     if (ancho == Ancho.AMPLIO) {
         Row(Modifier.fillMaxSize()) {
-            BarraLateral(seccion, onSeccion = { seccion = it })
+            BarraLateral(seccion, onSeccion = { destino ->
+                if (destino == Seccion.ANALISIS) familiaIdentificar = null
+                seccion = destino
+            })
             Box(Modifier.weight(1f)) { contenido() }
         }
     } else {
         Column(Modifier.fillMaxSize()) {
             Box(Modifier.weight(1f)) { contenido() }
-            BarraInferior(seccion, onSeccion = { seccion = it })
+            BarraInferior(seccion, onSeccion = { destino ->
+                if (destino == Seccion.ANALISIS) familiaIdentificar = null
+                seccion = destino
+            })
         }
     }
 }
@@ -141,19 +157,19 @@ private fun BarraInferior(seccion: Seccion, onSeccion: (Seccion) -> Unit) {
             selected = seccion == Seccion.ANALISIS,
             onClick = { onSeccion(Seccion.ANALISIS) },
             icon = { IconoAnalisis() },
-            label = { Text("Análisis") },
+            label = { Text("Identify") },
         )
         NavigationBarItem(
             selected = seccion == Seccion.ESPECIES,
             onClick = { onSeccion(Seccion.ESPECIES) },
             icon = { IconoEspecies() },
-            label = { Text("Especies") },
+            label = { Text("Species") },
         )
         NavigationBarItem(
             selected = seccion == Seccion.HISTORIAL,
             onClick = { onSeccion(Seccion.HISTORIAL) },
             icon = { IconoHistorial() },
-            label = { Text("Historial") },
+            label = { Text("History") },
         )
     }
 }
@@ -165,19 +181,19 @@ private fun BarraLateral(seccion: Seccion, onSeccion: (Seccion) -> Unit) {
             selected = seccion == Seccion.ANALISIS,
             onClick = { onSeccion(Seccion.ANALISIS) },
             icon = { IconoAnalisis() },
-            label = { Text("Análisis") },
+            label = { Text("Identify") },
         )
         NavigationRailItem(
             selected = seccion == Seccion.ESPECIES,
             onClick = { onSeccion(Seccion.ESPECIES) },
             icon = { IconoEspecies() },
-            label = { Text("Especies") },
+            label = { Text("Species") },
         )
         NavigationRailItem(
             selected = seccion == Seccion.HISTORIAL,
             onClick = { onSeccion(Seccion.HISTORIAL) },
             icon = { IconoHistorial() },
-            label = { Text("Historial") },
+            label = { Text("History") },
         )
     }
 }
@@ -203,11 +219,20 @@ private fun BarraLateral(seccion: Seccion, onSeccion: (Seccion) -> Unit) {
  * datos de los pasos siguientes, lo que los desmonta.
  */
 @Composable
-private fun FlujoAnalisis(data: AtlasData) {
+private fun FlujoAnalisis(data: AtlasData, familiaInicial: String? = null) {
     var pasoVisible by remember { mutableStateOf(PasoId.CAPTURA) }
     var captura by remember { mutableStateOf(CapturaState()) }
     var datosPregunta by remember { mutableStateOf<DatosPregunta?>(null) }
     var datosResultado by remember { mutableStateOf<DatosResultado?>(null) }
+
+    LaunchedEffect(familiaInicial) {
+        if (familiaInicial != null) {
+            captura = CapturaState()
+            datosPregunta = null
+            datosResultado = null
+            pasoVisible = PasoId.CAPTURA
+        }
+    }
 
     fun visibilidad(paso: PasoId): Modifier =
         if (pasoVisible == paso) Modifier.fillMaxSize() else Modifier.size(0.dp)
@@ -217,6 +242,7 @@ private fun FlujoAnalisis(data: AtlasData) {
             PantallaCaptura(
                 data = data,
                 estado = captura,
+                familiaFiltro = familiaInicial,
                 onCambio = { captura = it },
                 onContinuar = {
                     val etapa = captura.etapa
@@ -226,11 +252,11 @@ private fun FlujoAnalisis(data: AtlasData) {
                         val previa = datosPregunta
                         datosPregunta = if (previa != null && previa.stage == etapa && previa.tallaMm == talla) {
                             Almacen.actualizarDatosColecta(previa.sesionId, captura.mesColecta, zona)
-                            previa.copy(mesColecta = captura.mesColecta, zonaColecta = zona)
+                            previa.copy(mesColecta = captura.mesColecta, zonaColecta = zona, familyFilter = familiaInicial?.let(::setOf))
                         } else {
                             val id = Almacen.iniciarSesion(etapa, talla, captura.mesColecta, zona)
                             datosResultado = null
-                            DatosPregunta(etapa, talla, id, captura.mesColecta, zona)
+                            DatosPregunta(etapa, talla, id, captura.mesColecta, zona, familiaInicial?.let(::setOf))
                         }
                         pasoVisible = PasoId.PREGUNTA
                     }
@@ -250,6 +276,7 @@ private fun FlujoAnalisis(data: AtlasData) {
                         tallaMm = pregunta.tallaMm,
                         sesionId = pregunta.sesionId,
                         mesColecta = pregunta.mesColecta,
+                        familyFilter = pregunta.familyFilter,
                         onAtras = { pasoVisible = PasoId.CAPTURA },
                         onTerminar = { identificacion, observaciones, familias ->
                             datosResultado = DatosResultado(

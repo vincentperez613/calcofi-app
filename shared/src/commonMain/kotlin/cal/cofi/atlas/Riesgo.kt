@@ -68,7 +68,7 @@ data class EvaluacionRiesgo(
     val nivel: NivelRiesgo,
     val temporada: Temporada,
     val distribucion: Distribucion,
-    /** El porque, en lenguaje llano, para que el tecnico pueda discrepar. */
+    /** El porque, en texto, para que el tecnico pueda discrepar. */
     val razones: List<String>,
 )
 
@@ -84,48 +84,48 @@ fun evaluarRiesgo(mes: Int?, lifeHistory: LifeHistory?, distribucion: Distribuci
     val nivel = nivelDeRiesgo(temporada, distribucion)
 
     val razones = buildList {
-        val enMes = mes?.let { "Colectada en ${nombreMes(it)}" }
+        val enMes = mes?.let { "Collected in ${nombreMes(it)}" }
         val periodo = describirMeses(meses + pico)
         add(
             when (temporada) {
-                Temporada.PICO -> "$enMes: mes de mayor desove según el atlas."
-                Temporada.EN_TEMPORADA -> "$enMes: dentro de la temporada de desove ($periodo)."
+                Temporada.PICO -> "$enMes: peak spawning month according to the atlas."
+                Temporada.EN_TEMPORADA -> "$enMes: within the spawning season ($periodo)."
                 Temporada.CONTIGUO ->
-                    "$enMes: justo antes o después de la temporada de desove ($periodo). " +
-                        "Las larvas siguen en el plancton semanas después del desove."
-                Temporada.FUERA -> "$enMes: fuera de la temporada de desove ($periodo)."
+                    "$enMes: just before or after the spawning season ($periodo). " +
+                        "Larvae remain in the plankton for weeks after spawning."
+                Temporada.FUERA -> "$enMes: outside the spawning season ($periodo)."
                 Temporada.SIN_DATO ->
-                    if (mes == null) "Sin mes de colecta: no se comparó con la temporada de desove."
-                    else "El atlas no da meses de desove para esta especie."
+                    if (mes == null) "No collection month: not compared with the spawning season."
+                    else "The atlas gives no spawning months for this species."
             },
         )
         add(
             when (distribucion) {
-                Distribucion.SI -> "Marcaste que la zona de colecta cae dentro de la distribución."
-                Distribucion.NO -> "Marcaste que la zona de colecta queda fuera de la distribución."
+                Distribucion.SI -> "You marked the collection locality as within the species' range."
+                Distribucion.NO -> "You marked the collection locality as outside the species' range."
                 Distribucion.NO_SE ->
-                    if (lifeHistory?.range == null) "El atlas no trae la distribución de esta especie."
-                    else "Distribución sin marcar."
+                    if (lifeHistory?.range == null) "The atlas gives no geographic range for this species."
+                    else "Range not marked."
             },
         )
         val unFactorAFavor = (temporada == Temporada.PICO || temporada == Temporada.EN_TEMPORADA) ||
             distribucion == Distribucion.SI
         if (nivel == NivelRiesgo.NO_EVALUABLE && unFactorAFavor) {
-            add("Para decir que el riesgo es bajo hacen falta las dos cosas: temporada y distribución.")
+            add("A low risk rating requires both factors: spawning season and geographic range.")
         }
     }
     return EvaluacionRiesgo(nivel, temporada, distribucion, razones)
 }
 
 val NOMBRES_MES: List<String> = listOf(
-    "enero", "febrero", "marzo", "abril", "mayo", "junio",
-    "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December",
 )
 
 fun nombreMes(mes: Int): String = NOMBRES_MES.getOrElse(mes - 1) { mes.toString() }
 
-/** "junio, julio, agosto", o "todo el año" si estan los doce. */
+/** "June, July, August", o "year-round" si estan los doce. */
 fun describirMeses(meses: Collection<Int>): String {
     val unicos = meses.filter { it in 1..12 }.toSortedSet()
-    return if (unicos.size == 12) "todo el año" else unicos.joinToString(", ") { nombreMes(it) }
+    return if (unicos.size == 12) "year-round" else unicos.joinToString(", ") { nombreMes(it) }
 }

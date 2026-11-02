@@ -41,13 +41,13 @@ actual object AlmacenamientoPlataforma {
             putExtra(Intent.EXTRA_STREAM, uri)
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
-        val selector = Intent.createChooser(intentEnviar, "Compartir CSV").apply {
+        val selector = Intent.createChooser(intentEnviar, "Share CSV").apply {
             // appContext no es una Activity: hace falta este flag para
             // poder lanzar el chooser desde un contexto de aplicacion.
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
         appContext.startActivity(selector)
-        return "Se abrió el menú para compartir el CSV."
+        return "Opened the share menu for the CSV."
     }
 
     actual fun ahoraIso(): String =
