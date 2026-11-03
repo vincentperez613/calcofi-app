@@ -557,6 +557,12 @@ private fun RecorteFigura(bitmap: ImageBitmap, figura: FigureRef, dimensiones: D
         tamano = IntSize(bitmap.width, bitmap.height)
     }
 
+    // Papel del color del fondo y tinta del color del texto: en modo oscuro
+    // la lamina sale invertida y sin un rectangulo blanco encima (ver filtroLamina).
+    val papel = MaterialTheme.colorScheme.background
+    val tinta = MaterialTheme.colorScheme.onBackground
+    val filtro = remember(papel, tinta) { filtroLamina(papel, tinta) }
+
     Column(verticalArrangement = Arrangement.spacedBy(dimensiones.espaciado / 4)) {
         Canvas(
             modifier = Modifier
@@ -569,6 +575,7 @@ private fun RecorteFigura(bitmap: ImageBitmap, figura: FigureRef, dimensiones: D
                 srcSize = tamano,
                 dstOffset = IntOffset.Zero,
                 dstSize = IntSize(size.width.toInt(), size.height.toInt()),
+                colorFilter = filtro,
             )
         }
         if (!dentroDeLimites) {

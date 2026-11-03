@@ -106,6 +106,15 @@ expect object AlmacenamientoPlataforma {
     fun compartirCsv(contenido: String, nombreArchivo: String): String
 
     fun ahoraIso(): String
+
+    /**
+     * Preferencias de la app (el modo claro/oscuro), en un archivo aparte del
+     * de sesiones: un historial corrupto no debe llevarse la preferencia, ni
+     * al reves. null si nunca se guardo nada.
+     */
+    fun leerPreferencias(): String?
+
+    fun escribirPreferencias(contenido: String)
 }
 
 private val jsonSesiones = Json { ignoreUnknownKeys = true }
