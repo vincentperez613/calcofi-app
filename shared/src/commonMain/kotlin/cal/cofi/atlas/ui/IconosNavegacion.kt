@@ -75,6 +75,26 @@ fun IconoHistorial(modifier: Modifier = Modifier) {
     }
 }
 
+/** Una "i" dentro de un circulo, el signo convencional de "informacion". */
+@Composable
+fun IconoAcerca(modifier: Modifier = Modifier) {
+    val color = LocalContentColor.current
+    Canvas(modifier = modifier.size(24.dp)) {
+        val grosor = size.minDimension * 0.1f
+        val radio = size.minDimension * 0.4f
+        val centro = Offset(size.width * 0.5f, size.height * 0.5f)
+        drawCircle(color = color, radius = radio, center = centro, style = Stroke(width = grosor))
+        drawCircle(color = color, radius = grosor * 0.7f, center = Offset(centro.x, centro.y - radio * 0.45f))
+        drawLine(
+            color = color,
+            start = Offset(centro.x, centro.y - radio * 0.1f),
+            end = Offset(centro.x, centro.y + radio * 0.5f),
+            strokeWidth = grosor,
+            cap = StrokeCap.Round,
+        )
+    }
+}
+
 @Composable
 fun IconoEspecies(modifier: Modifier = Modifier) {
     val color = LocalContentColor.current

@@ -22,8 +22,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -565,36 +567,54 @@ private fun AvisoFamilias(
  * dibujo muestra el espacio reservado ([DibujoPendiente]).
  */
 val DIBUJOS_OPCION: Map<Pair<String, String>, @Composable (Color, Modifier) -> Unit> = mapOf(
-    ("gut_length" to "short") to { color, mod -> DibujoIntestino(color, mod, fraccionAno = 0.38f) },
+    ("gut_length" to "short") to { color, mod -> DibujoIntestino(color, mod, fraccionAno = 0.33f) },
     ("gut_length" to "long") to { color, mod -> DibujoIntestino(color, mod, fraccionAno = 0.72f) },
 )
 
 /**
- * Larva de perfil: notocorda, cabeza, el intestino hasta el ano (el punto) y
- * la mitad del cuerpo marcada con una linea punteada, que es contra lo que
- * se compara.
+ * Larva de perfil, de punta a punta del dibujo: contorno, ojo, el intestino
+ * a lo largo del borde ventral hasta el ano (el punto) y la mitad del cuerpo
+ * marcada con una linea punteada, que es contra lo que se compara.
  */
 @Composable
 private fun DibujoIntestino(color: Color, modifier: Modifier = Modifier, fraccionAno: Float) {
     Canvas(modifier = modifier) {
-        val grosor = size.minDimension * 0.05f
-        val inicio = size.width * 0.12f
-        val fin = size.width * 0.9f
-        val largo = fin - inicio
-        val eje = size.height * 0.42f
-        val tripa = size.height * 0.6f
-        val ano = inicio + largo * fraccionAno
+        val w = size.width
+        val h = size.height
+        val grosor = size.minDimension * 0.035f
+        val hocico = 0.04f
+        val cola = 0.96f
+        // Borde ventral: de la garganta (x=0.2, y=0.68) a la cola (x=0.96, y=0.54).
+        fun ventral(x: Float) = 0.68f - (x - 0.2f) / (cola - 0.2f) * 0.14f
 
-        drawLine(color, Offset(inicio, eje), Offset(fin, eje), strokeWidth = grosor, cap = StrokeCap.Round)
-        drawCircle(color, radius = size.minDimension * 0.12f, center = Offset(inicio + largo * 0.06f, eje + grosor))
-        drawLine(color, Offset(inicio + largo * 0.12f, tripa), Offset(ano, tripa), strokeWidth = grosor * 1.6f, cap = StrokeCap.Round)
-        drawCircle(color, radius = grosor * 1.4f, center = Offset(ano, tripa))
+        val cuerpo = Path().apply {
+            moveTo(w * hocico, h * 0.5f)
+            quadraticTo(w * 0.06f, h * 0.3f, w * 0.2f, h * 0.32f)
+            lineTo(w * cola, h * 0.46f)
+            lineTo(w * cola, h * 0.54f)
+            lineTo(w * 0.2f, h * ventral(0.2f))
+            quadraticTo(w * 0.06f, h * 0.7f, w * hocico, h * 0.5f)
+            close()
+        }
+        drawPath(cuerpo, color, style = Stroke(width = grosor, join = StrokeJoin.Round))
+        drawCircle(color, radius = size.minDimension * 0.045f, center = Offset(w * 0.11f, h * 0.45f))
+
+        val ano = hocico + (cola - hocico) * fraccionAno
         drawLine(
-            color.copy(alpha = 0.5f),
-            Offset(inicio + largo / 2, size.height * 0.2f),
-            Offset(inicio + largo / 2, size.height * 0.8f),
-            strokeWidth = grosor * 0.6f,
-            pathEffect = PathEffect.dashPathEffect(floatArrayOf(grosor * 1.5f, grosor * 1.5f)),
+            color,
+            Offset(w * 0.17f, h * (ventral(0.17f) - 0.06f)),
+            Offset(w * ano, h * (ventral(ano) - 0.04f)),
+            strokeWidth = grosor * 2.2f,
+            cap = StrokeCap.Round,
+        )
+        drawCircle(color, radius = grosor * 1.8f, center = Offset(w * ano, h * ventral(ano)))
+
+        drawLine(
+            color.copy(alpha = 0.55f),
+            Offset(w * 0.5f, h * 0.18f),
+            Offset(w * 0.5f, h * 0.82f),
+            strokeWidth = grosor,
+            pathEffect = PathEffect.dashPathEffect(floatArrayOf(grosor * 2f, grosor * 2f)),
         )
     }
 }

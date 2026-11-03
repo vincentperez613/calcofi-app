@@ -30,11 +30,13 @@ import cal.cofi.atlas.ui.Almacen
 import cal.cofi.atlas.ui.Ancho
 import cal.cofi.atlas.ui.CapturaState
 import cal.cofi.atlas.ui.ContenedorPantalla
+import cal.cofi.atlas.ui.IconoAcerca
 import cal.cofi.atlas.ui.IconoAnalisis
 import cal.cofi.atlas.ui.IconoEspecies
 import cal.cofi.atlas.ui.IconoHistorial
 import cal.cofi.atlas.ui.LocalAncho
 import cal.cofi.atlas.ui.LocalDimensiones
+import cal.cofi.atlas.ui.PantallaAcerca
 import cal.cofi.atlas.ui.PantallaCaptura
 import cal.cofi.atlas.ui.PantallaEspecies
 import cal.cofi.atlas.ui.PantallaHistorial
@@ -65,7 +67,7 @@ private data class DatosResultado(
 )
 
 /** Las secciones de la app, elegidas desde la barra de navegacion en App.kt. */
-private enum class Seccion { ANALISIS, ESPECIES, HISTORIAL }
+private enum class Seccion { ANALISIS, ESPECIES, HISTORIAL, ACERCA }
 
 @Composable
 @Preview
@@ -87,7 +89,7 @@ fun App() {
 }
 
 /**
- * Dueno de la seccion activa (Analisis / Historial) y de la barra que la
+ * Dueno de la seccion activa (Analisis / Especies / Historial / About) y de la barra que la
  * elige: NavigationRail a la izquierda en AMPLIO, NavigationBar abajo en
  * COMPACTO/MEDIO. Las pantallas no conocen esta navegacion.
  *
@@ -118,6 +120,9 @@ private fun AppConNavegacion(data: AtlasData) {
             }
             Box(if (seccion == Seccion.HISTORIAL) Modifier.fillMaxSize() else Modifier.size(0.dp)) {
                 PantallaHistorial(activa = seccion == Seccion.HISTORIAL)
+            }
+            Box(if (seccion == Seccion.ACERCA) Modifier.fillMaxSize() else Modifier.size(0.dp)) {
+                PantallaAcerca(data)
             }
         }
     }
@@ -156,6 +161,12 @@ private fun BarraInferior(seccion: Seccion, onSeccion: (Seccion) -> Unit) {
             icon = { IconoHistorial() },
             label = { Text("History") },
         )
+        NavigationBarItem(
+            selected = seccion == Seccion.ACERCA,
+            onClick = { onSeccion(Seccion.ACERCA) },
+            icon = { IconoAcerca() },
+            label = { Text("About") },
+        )
     }
 }
 
@@ -179,6 +190,12 @@ private fun BarraLateral(seccion: Seccion, onSeccion: (Seccion) -> Unit) {
             onClick = { onSeccion(Seccion.HISTORIAL) },
             icon = { IconoHistorial() },
             label = { Text("History") },
+        )
+        NavigationRailItem(
+            selected = seccion == Seccion.ACERCA,
+            onClick = { onSeccion(Seccion.ACERCA) },
+            icon = { IconoAcerca() },
+            label = { Text("About") },
         )
     }
 }

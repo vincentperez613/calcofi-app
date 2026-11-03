@@ -117,8 +117,8 @@ data class OpcionLlana(val valor: String, val texto: String)
  */
 val OPCIONES_CATEGORICAS: Map<String, List<OpcionLlana>> = mapOf(
     "gut_length" to listOf(
-        OpcionLlana("short", "Less than half BL\n(anus in anterior half)"),
-        OpcionLlana("long", "More than half BL\n(anus in posterior half)"),
+        OpcionLlana("short", "Anus before midbody\n(preanal < ½ BL)"),
+        OpcionLlana("long", "Anus behind midbody\n(preanal > ½ BL)"),
     ),
 )
 
