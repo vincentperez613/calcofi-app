@@ -20,6 +20,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import cal.cofi.atlas.NivelRiesgo
+import cal.cofi.atlas.TaxonLevel
 import cal.cofi.atlas.nombreMes
 
 /**
@@ -102,7 +103,7 @@ private fun TarjetaSesion(sesion: SesionGuardada, dimensiones: Dimensiones, onCl
             fontSize = dimensiones.tamanoTextoBase,
             fontWeight = FontWeight.Bold,
         )
-        val resumen = sesion.resultado?.let { "${it.label} (${it.nivel})" }
+        val resumen = sesion.resultado?.let(::resumenResultado)
             ?: "Unfinished — ${conteo(sesion.observaciones.size, "answer", "answers")}"
         Text(resumen, fontSize = dimensiones.tamanoTextoBase)
     }
@@ -143,7 +144,8 @@ private fun DetalleSesion(sesion: SesionGuardada, dimensiones: Dimensiones, onVo
             fontStyle = FontStyle.Italic,
         )
     } else {
-        Text("${resultado.label} (${resultado.nivel})", fontSize = dimensiones.tamanoTextoBase)
+        Text(resumenResultado(resultado), fontSize = dimensiones.tamanoTextoBase)
+        Text("Top candidates", fontSize = dimensiones.tamanoTextoBase, fontWeight = FontWeight.Bold)
         for (candidato in resultado.top3) {
             Text(
                 "${candidato.especie} — ${candidato.scorePorcentaje}%",
@@ -165,6 +167,35 @@ private fun DetalleSesion(sesion: SesionGuardada, dimensiones: Dimensiones, onVo
     }
 
     BotonPrincipal(texto = "Back to list", onClick = onVolver)
+}
+
+/**
+ * El resultado como lo dice la pantalla de resultado: cuantas
+ * coincidencias, nunca el nivel crudo ("UNRESOLVED" no le dice nada al
+ * tecnico). Las sesiones de antes de [ResultadoGuardado.coincidencias] lo
+ * sacan del label donde se puede: SPECIES es una, y UNRESOLVED nombra a
+ * todas separadas por " / ". Con GENUS o FAMILY viejos no hay cuantas.
+ */
+internal fun resumenResultado(resultado: ResultadoGuardado): String {
+    val sinDatos = resultado.label == "no data"
+    val n = resultado.coincidencias ?: when {
+        sinDatos -> 0
+        resultado.nivel == TaxonLevel.SPECIES.name -> 1
+        resultado.nivel == TaxonLevel.UNRESOLVED.name -> resultado.label.split(" / ").size
+        else -> null
+    }
+    val grupo = when (resultado.nivel) {
+        TaxonLevel.GENUS.name -> "all in genus ${resultado.label.removeSuffix(" sp.")}"
+        TaxonLevel.FAMILY.name -> "all in family ${resultado.label}"
+        else -> null
+    }
+    val cuantas = when (n) {
+        0 -> return "No matches"
+        1 -> return "1 match: ${resultado.label}"
+        null -> "Several matches"
+        else -> "$n matches"
+    }
+    return if (grupo != null) "$cuantas, $grupo" else cuantas
 }
 
 private fun nombreNivel(nivel: NivelRiesgo): String = when (nivel) {

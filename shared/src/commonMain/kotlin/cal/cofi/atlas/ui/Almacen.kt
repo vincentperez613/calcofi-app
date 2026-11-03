@@ -46,11 +46,17 @@ data class CandidatoGuardado(
     val razonesRiesgo: List<String> = emptyList(),
 )
 
+/**
+ * [coincidencias] es cuantos candidatos compartian el titular
+ * (Identification.tied): con GENUS o FAMILY no se puede sacar del label.
+ * null en las sesiones guardadas antes de que existiera (ver resumenResultado).
+ */
 @Serializable
 data class ResultadoGuardado(
     val label: String,
     val nivel: String,
     val top3: List<CandidatoGuardado>,
+    val coincidencias: Int? = null,
 )
 
 /**
@@ -195,6 +201,7 @@ object Almacen {
                         CandidatoGuardado(it.species.species, (it.score * 100).toInt())
                             .conRiesgo(riesgos[it.species.species])
                     },
+                    coincidencias = identificacion.tied.size,
                 ),
             )
         }

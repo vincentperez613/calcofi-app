@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -146,10 +147,15 @@ fun ProveedorDeLayout(content: @Composable () -> Unit) {
  * Scrollea verticalmente. Ninguna pantalla puede depender de que la ventana
  * sea lo bastante grande para mostrar todo sin cortar — en un telefono eso
  * ni siquiera es una opcion, no hay forma de "agrandar la ventana".
+ *
+ * [desplazable] = false solo para pantallas cuyo contenido ya scrollea por
+ * dentro (un carrusel, una lista lazy): ese hijo reparte el alto con
+ * weight(1f), que dentro de un verticalScroll no tendria alto que repartir.
  */
 @Composable
 fun ContenedorPantalla(
     modifier: Modifier = Modifier,
+    desplazable: Boolean = true,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val dimensiones = LocalDimensiones.current
@@ -158,7 +164,7 @@ fun ContenedorPantalla(
             modifier = Modifier
                 .fillMaxWidth()
                 .widthIn(max = dimensiones.anchoMaximoContenido)
-                .verticalScroll(rememberScrollState())
+                .then(if (desplazable) Modifier.verticalScroll(rememberScrollState()) else Modifier.fillMaxHeight())
                 .padding(dimensiones.espaciado),
             verticalArrangement = Arrangement.spacedBy(dimensiones.espaciado),
             content = content,

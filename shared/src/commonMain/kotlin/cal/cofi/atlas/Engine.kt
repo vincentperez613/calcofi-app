@@ -45,10 +45,17 @@ data class Candidate(
 
 enum class TaxonLevel { SPECIES, GENUS, FAMILY, UNRESOLVED }
 
+/**
+ * [tied] son los candidatos que comparten el titular (uno solo si
+ * [level] es SPECIES), en el orden de [candidates]. Con UNRESOLVED
+ * [label] los nombra a todos: pueden ser cientos si casi todo se contesto
+ * "no se", asi que la UI cuenta [tied] en vez de mostrar [label] entero.
+ */
 data class Identification(
     val label: String,
     val level: TaxonLevel,
     val candidates: List<Candidate>,
+    val tied: List<Candidate> = emptyList(),
 )
 
 /**
@@ -263,18 +270,18 @@ class IdentificationEngine(private val data: AtlasData) {
         val tied = base.filter { abs(best - it.score) < 1e-9 }
 
         if (tied.size == 1) {
-            return Identification(tied.first().species.species, TaxonLevel.SPECIES, ranked)
+            return Identification(tied.first().species.species, TaxonLevel.SPECIES, ranked, tied)
         }
         val genera = tied.map { it.species.genus }.toSet()
         if (genera.size == 1) {
-            return Identification("${genera.first()} sp.", TaxonLevel.GENUS, ranked)
+            return Identification("${genera.first()} sp.", TaxonLevel.GENUS, ranked, tied)
         }
         val fams = tied.map { it.species.family }.toSet()
         if (fams.size == 1) {
-            return Identification(fams.first(), TaxonLevel.FAMILY, ranked)
+            return Identification(fams.first(), TaxonLevel.FAMILY, ranked, tied)
         }
         val nombres = tied.map { it.species.species }.sorted().joinToString(" / ")
-        return Identification(nombres, TaxonLevel.UNRESOLVED, ranked)
+        return Identification(nombres, TaxonLevel.UNRESOLVED, ranked, tied)
     }
 
     // --------------------------------------------------- pregunta adaptativa

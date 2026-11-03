@@ -77,6 +77,29 @@ class AlmacenFormatoTest {
     }
 
     @Test
+    fun unaSesionViejaCargaSinCuantasCoincidencias() {
+        assertNull(decodificarSesiones(sesionVieja).single().resultado!!.coincidencias)
+    }
+
+    @Test
+    fun elHistorialDiceCuantasCoincidenciasNuncaElNivelCrudo() {
+        fun resumen(label: String, nivel: String, n: Int? = null) =
+            resumenResultado(ResultadoGuardado(label, nivel, emptyList(), coincidencias = n))
+
+        assertEquals("1 match: Engraulis mordax", resumen("Engraulis mordax", "SPECIES", 1))
+        assertEquals("5 matches, all in genus Anchoa", resumen("Anchoa sp.", "GENUS", 5))
+        assertEquals("3 matches, all in family Engraulidae", resumen("Engraulidae", "FAMILY", 3))
+        assertEquals("12 matches", resumen("A a / B b / ...", "UNRESOLVED", 12))
+        assertEquals("No matches", resumen("no data", "UNRESOLVED", 0))
+
+        // Sesiones de antes de guardar cuantas: lo que se pueda sacar del label.
+        assertEquals("1 match: Engraulis mordax", resumen("Engraulis mordax", "SPECIES"))
+        assertEquals("3 matches", resumen("Alfa a / Beta b / Gamma c", "UNRESOLVED"))
+        assertEquals("Several matches, all in genus Anchoa", resumen("Anchoa sp.", "GENUS"))
+        assertEquals("No matches", resumen("no data", "UNRESOLVED"))
+    }
+
+    @Test
     fun elRiesgoSeExporta() {
         val sesion = SesionGuardada(
             id = "r", fechaHoraIso = "2026-10-15T09:00:00", tallaMm = 18.4, etapa = "POF",
