@@ -20,8 +20,10 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -41,6 +43,7 @@ import cal.cofi.atlas.Stage
 import cal.cofi.atlas.TipoPregunta
 import cal.cofi.atlas.efectoEnFamilias
 import cal.cofi.atlas.evaluarRiesgo
+import cal.cofi.atlas.familiasRespaldadas
 import cal.cofi.atlas.siguientePaso
 import cal.cofi.atlas.valorParaTabla
 import kotlinx.coroutines.Dispatchers
@@ -149,7 +152,10 @@ fun PantallaPregunta(
         val ancla = p.ancla
         val valor = valorParaTabla(p, respuestas)
         val efecto = if (ancla != null && valor != null) {
-            efectoEnFamilias(data.coarse, ancla.tablaFamilia, valor, estado.familias, familiasCargadas)
+            efectoEnFamilias(
+                data.coarse, ancla.tablaFamilia, valor, estado.familias, familiasCargadas,
+                familiasRespaldadas(data.species, ancla, valor),
+            )
         } else {
             null
         }
@@ -479,7 +485,10 @@ private fun VistaPreviaFamilias(
             .collectLatest { v ->
                 efecto = v?.let {
                     withContext(Dispatchers.Default) {
-                        efectoEnFamilias(data.coarse, ancla.tablaFamilia, it, familiasPrevias, familiasCargadas)
+                        efectoEnFamilias(
+                            data.coarse, ancla.tablaFamilia, it, familiasPrevias, familiasCargadas,
+                            familiasRespaldadas(data.species, ancla, it),
+                        )
                     }
                 }
             }
@@ -496,15 +505,18 @@ private fun VistaPreviaFamilias(
     }
     val e = efecto ?: return
     if (valor == null) return
+    val ademas = buildList {
+        if (e.noListadasConservadas.isNotEmpty()) {
+            add("${conteo(e.noListadasConservadas.size, "loaded family", "loaded families")} not listed in the family table")
+        }
+        if (e.respaldadasPorFicha.isNotEmpty()) {
+            add("${conteo(e.respaldadasPorFicha.size, "family", "families")} outside the table whose species ranges admit this count")
+        }
+    }
     Text(
         "With this count, ${conteo(e.deLaTabla.size, "family", "families")} would remain, " +
             "${e.conEspeciesCargadas.size} of them with species loaded." +
-            if (e.noListadasConservadas.isNotEmpty()) {
-                " Also still in play: ${conteo(e.noListadasConservadas.size, "loaded family", "loaded families")} " +
-                    "not listed in the family table."
-            } else {
-                ""
-            },
+            if (ademas.isNotEmpty()) " Also still in play: ${ademas.joinToString("; ")}." else "",
         fontSize = dimensiones.tamanoTextoBase,
     )
 }
@@ -549,11 +561,43 @@ private fun AvisoFamilias(
 // --------------------------------------------------------------- opciones
 
 /**
- * Dibujo de cada opcion categorica, por (caracter, valor). Vacio hasta que
- * lleguen los datos de forma; mientras, cada tarjeta muestra el espacio
- * reservado para su dibujo ([DibujoPendiente]).
+ * Dibujo de cada opcion categorica, por (caracter, valor). Una opcion sin
+ * dibujo muestra el espacio reservado ([DibujoPendiente]).
  */
-val DIBUJOS_OPCION: Map<Pair<String, String>, @Composable (Color, Modifier) -> Unit> = emptyMap()
+val DIBUJOS_OPCION: Map<Pair<String, String>, @Composable (Color, Modifier) -> Unit> = mapOf(
+    ("gut_length" to "short") to { color, mod -> DibujoIntestino(color, mod, fraccionAno = 0.38f) },
+    ("gut_length" to "long") to { color, mod -> DibujoIntestino(color, mod, fraccionAno = 0.72f) },
+)
+
+/**
+ * Larva de perfil: notocorda, cabeza, el intestino hasta el ano (el punto) y
+ * la mitad del cuerpo marcada con una linea punteada, que es contra lo que
+ * se compara.
+ */
+@Composable
+private fun DibujoIntestino(color: Color, modifier: Modifier = Modifier, fraccionAno: Float) {
+    Canvas(modifier = modifier) {
+        val grosor = size.minDimension * 0.05f
+        val inicio = size.width * 0.12f
+        val fin = size.width * 0.9f
+        val largo = fin - inicio
+        val eje = size.height * 0.42f
+        val tripa = size.height * 0.6f
+        val ano = inicio + largo * fraccionAno
+
+        drawLine(color, Offset(inicio, eje), Offset(fin, eje), strokeWidth = grosor, cap = StrokeCap.Round)
+        drawCircle(color, radius = size.minDimension * 0.12f, center = Offset(inicio + largo * 0.06f, eje + grosor))
+        drawLine(color, Offset(inicio + largo * 0.12f, tripa), Offset(ano, tripa), strokeWidth = grosor * 1.6f, cap = StrokeCap.Round)
+        drawCircle(color, radius = grosor * 1.4f, center = Offset(ano, tripa))
+        drawLine(
+            color.copy(alpha = 0.5f),
+            Offset(inicio + largo / 2, size.height * 0.2f),
+            Offset(inicio + largo / 2, size.height * 0.8f),
+            strokeWidth = grosor * 0.6f,
+            pathEffect = PathEffect.dashPathEffect(floatArrayOf(grosor * 1.5f, grosor * 1.5f)),
+        )
+    }
+}
 
 @Composable
 private fun SelectorOpciones(clave: String, valores: List<String>, onElegir: (String) -> Unit) {
