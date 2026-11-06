@@ -6,6 +6,7 @@ import cal.cofi.atlas.CHARACTER_CLASS
 import cal.cofi.atlas.NUNCA_SE_PREGUNTAN
 import cal.cofi.atlas.ReglasInterrogatorio
 import cal.cofi.atlas.Stage
+import cal.cofi.atlas.TALLA_ETAPA
 import cal.cofi.atlas.claveCanonica
 
 /**
@@ -26,6 +27,8 @@ import cal.cofi.atlas.claveCanonica
  * de su base), no su origen: el atlas dice "D insertion above A ray 5-7".
  */
 val PROMPTS: Map<String, String> = mapOf(
+    "gut_length" to
+        "Preanal length (snout to anus) relative to body length (BL):",
     "myomeres_total" to
         "Count total myomeres (preanal + postanal).",
     "myomeres_preanal" to
@@ -102,14 +105,22 @@ fun conteo(n: Int, singular: String, plural: String): String = "$n ${if (n == 1)
 data class OpcionLlana(val valor: String, val texto: String)
 
 /**
- * Catalogo de opciones por caracter, en el orden en que se muestran. Vacio
- * por ahora: todavia no esta decidido de donde salen las categorias de forma
- * ni sus valores por especie, y el bundle no trae ningun caracter "shape".
- * Cuando lleguen, cada caracter necesita aqui TODAS sus opciones con su
- * texto (y su pregunta en PROMPTS y su nombre corto en ETIQUETAS); si falta
- * alguna opcion, el motor no lo pregunta.
+ * Catalogo de opciones por caracter, en el orden en que se muestran. Cada
+ * caracter necesita aqui TODAS sus opciones con su texto (y su pregunta en
+ * PROMPTS y su nombre corto en ETIQUETAS); si falta alguna opcion, el motor
+ * no lo pregunta.
+ *
+ * gut_length: el pipeline solo clasifica una especie cuando el atlas la deja
+ * claramente de un lado (<=45% o >=55% BL), asi que una larva cerca de la
+ * mitad no deberia tener problema con ninguna de las dos respuestas — y si
+ * duda, "Unknown" no penaliza a nadie.
  */
-val OPCIONES_CATEGORICAS: Map<String, List<OpcionLlana>> = emptyMap()
+val OPCIONES_CATEGORICAS: Map<String, List<OpcionLlana>> = mapOf(
+    "gut_length" to listOf(
+        OpcionLlana("short", "Anus before midbody\n(preanal < ½ BL)"),
+        OpcionLlana("long", "Anus behind midbody\n(preanal > ½ BL)"),
+    ),
+)
 
 /** Union de caracteres preguntables, para el interrogatorio. */
 val PREGUNTABLES: Set<String> =
@@ -130,6 +141,8 @@ val REGLAS_APP: ReglasInterrogatorio = ReglasInterrogatorio(
  * y se muestran tal cual.
  */
 private val ETIQUETAS: Map<String, String> = mapOf(
+    TALLA_ETAPA to "Body length (BL) for the stage",
+    "gut_length" to "Preanal length vs. half BL",
     "myomeres_total" to "Total myomeres",
     "myomeres_preanal" to "Preanal myomeres",
     "myomeres_postanal" to "Postanal myomeres",

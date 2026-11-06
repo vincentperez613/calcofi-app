@@ -46,11 +46,17 @@ data class CandidatoGuardado(
     val razonesRiesgo: List<String> = emptyList(),
 )
 
+/**
+ * [coincidencias] es cuantos candidatos compartian el titular
+ * (Identification.tied): con GENUS o FAMILY no se puede sacar del label.
+ * null en las sesiones guardadas antes de que existiera (ver resumenResultado).
+ */
 @Serializable
 data class ResultadoGuardado(
     val label: String,
     val nivel: String,
     val top3: List<CandidatoGuardado>,
+    val coincidencias: Int? = null,
 )
 
 /**
@@ -100,6 +106,15 @@ expect object AlmacenamientoPlataforma {
     fun compartirCsv(contenido: String, nombreArchivo: String): String
 
     fun ahoraIso(): String
+
+    /**
+     * Preferencias de la app (el modo claro/oscuro), en un archivo aparte del
+     * de sesiones: un historial corrupto no debe llevarse la preferencia, ni
+     * al reves. null si nunca se guardo nada.
+     */
+    fun leerPreferencias(): String?
+
+    fun escribirPreferencias(contenido: String)
 }
 
 private val jsonSesiones = Json { ignoreUnknownKeys = true }
@@ -195,6 +210,7 @@ object Almacen {
                         CandidatoGuardado(it.species.species, (it.score * 100).toInt())
                             .conRiesgo(riesgos[it.species.species])
                     },
+                    coincidencias = identificacion.tied.size,
                 ),
             )
         }

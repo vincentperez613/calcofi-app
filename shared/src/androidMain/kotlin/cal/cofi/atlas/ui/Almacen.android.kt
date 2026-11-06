@@ -52,4 +52,16 @@ actual object AlmacenamientoPlataforma {
 
     actual fun ahoraIso(): String =
         SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US).format(Date())
+
+    private val archivoPreferencias: File
+        get() = File(appContext.filesDir, "preferencias.json")
+
+    actual fun leerPreferencias(): String? {
+        val archivo = archivoPreferencias
+        return if (archivo.exists()) archivo.readText(Charsets.UTF_8) else null
+    }
+
+    actual fun escribirPreferencias(contenido: String) {
+        archivoPreferencias.writeText(contenido, Charsets.UTF_8)
+    }
 }

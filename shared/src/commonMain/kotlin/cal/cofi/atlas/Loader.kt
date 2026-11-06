@@ -22,6 +22,8 @@ private data class SpeciesDto(
     val diagnostic: Map<String, DiagnosticDto> = emptyMap(),
     val sample_sizes: Map<String, SampleDto> = emptyMap(),
     val life_history: LifeHistoryDto? = null,
+    /** {"PrF": [min, max]}, con null en el extremo que la ficha no fija. */
+    val stage_sizes: Map<String, List<Double?>> = emptyMap(),
 )
 
 /**
@@ -110,6 +112,11 @@ object AtlasLoader {
                     },
                     sampleSizes = d.sample_sizes.mapValues { SampleSize(it.value.kind, it.value.n) },
                     lifeHistory = d.life_history?.toDomain(),
+                    // Una ventana mal formada se ignora: sin ventana, la
+                    // talla no dice nada de la especie, que es lo seguro.
+                    stageSizes = d.stage_sizes
+                        .filterValues { it.size == 2 && (it[0] != null || it[1] != null) }
+                        .mapValues { VentanaTalla(it.value[0], it.value[1]) },
                 )
             }
 

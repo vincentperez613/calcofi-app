@@ -33,7 +33,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
@@ -315,7 +314,9 @@ private fun TarjetaFamiliaIndice(
                     .fillMaxWidth()
                     .aspectRatio(3f / 2f)
                     .clip(RoundedCornerShape(8.dp))
-                    .background(Color.White),
+                    // Mismo color que el papel de ImagenEspecie: el dibujo
+                    // escalado con Fit no deja franjas de otro color.
+                    .background(MaterialTheme.colorScheme.background),
                 contentAlignment = Alignment.Center,
             ) {
                 if (archivoImagen != null) {
@@ -371,8 +372,8 @@ private fun TarjetaFamiliaIndice(
                         .fillMaxWidth()
                         .height(36.dp),
                     colors = ButtonDefaults.textButtonColors(
-                        containerColor = Color(0xFF7062A4),
-                        contentColor = Color.White,
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary,
                     ),
                     shape = RoundedCornerShape(dimensiones.espaciado / 3),
                 ) {
@@ -416,6 +417,12 @@ internal fun ImagenEspecie(
 ) {
     val ruta = "$carpetaImagen/$archivo"
     var estado by remember(ruta) { mutableStateOf<EstadoImagenEspecie>(EstadoImagenEspecie.Cargando) }
+    // Los dibujos son blanco y negro como las laminas: papel del color del
+    // fondo y tinta del color del texto, asi en modo oscuro salen invertidos
+    // en vez de un rectangulo blanco (ver filtroLamina).
+    val papel = MaterialTheme.colorScheme.background
+    val tinta = MaterialTheme.colorScheme.onBackground
+    val filtro = remember(papel, tinta) { filtroLamina(papel, tinta) }
 
     LaunchedEffect(ruta) {
         estado = EstadoImagenEspecie.Cargando
@@ -465,6 +472,7 @@ internal fun ImagenEspecie(
             bitmap = actual.bitmap,
             contentDescription = descripcion,
             contentScale = ContentScale.Fit,
+            colorFilter = filtro,
             modifier = modifier.let {
                 when {
                     altura != null -> it.height(altura)

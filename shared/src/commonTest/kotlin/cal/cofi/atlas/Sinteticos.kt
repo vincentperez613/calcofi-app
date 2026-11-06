@@ -12,6 +12,7 @@ internal fun especieSintetica(
     meristics: Map<String, Pair<Double, Double>> = emptyMap(),
     diagnostic: Map<String, DiagnosticChar> = emptyMap(),
     lifeHistory: LifeHistory? = null,
+    stageSizes: Map<Stage, VentanaTalla> = emptyMap(),
 ): Species = Species(
     id = id,
     // Un genero por especie: asi un empate se resuelve a familia y no
@@ -23,6 +24,7 @@ internal fun especieSintetica(
     diagnostic = diagnostic,
     sampleSizes = emptyMap(),
     lifeHistory = lifeHistory,
+    stageSizes = stageSizes.mapKeys { it.key.code },
 )
 
 internal fun rango(min: Double, max: Double) = DiagnosticChar(range = Range(min, max))
@@ -87,7 +89,10 @@ internal fun interrogar(
                 val ancla = p.ancla
                 val total = valorParaTabla(p, respuestas)
                 val efecto = if (ancla != null && total != null) {
-                    efectoEnFamilias(data.coarse, ancla.tablaFamilia, total, estado.familias, familiasCargadas)
+                    efectoEnFamilias(
+                        data.coarse, ancla.tablaFamilia, total, estado.familias, familiasCargadas,
+                        familiasRespaldadas(data.species, ancla, total),
+                    )
                 } else {
                     null
                 }

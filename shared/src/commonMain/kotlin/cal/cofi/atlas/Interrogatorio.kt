@@ -264,25 +264,55 @@ private fun categoricosSinRedaccion(
  * la tabla da por compatibles, y [conEspeciesCargadas] cuantas de esas
  * tienen especies en el bundle. [noListadasConservadas] son familias
  * cargadas que la tabla no menciona y por eso siguen en juego (ver
- * CoarseFilter.noListadas).
+ * CoarseFilter.noListadas). [respaldadasPorFicha] son las que la tabla
+ * descartaria pero siguen porque la ficha de alguna de sus especies admite
+ * el conteo (ver [familiasRespaldadas]).
  */
 data class EfectoEnFamilias(
     val familias: Set<String>,
     val deLaTabla: Set<String>,
     val conEspeciesCargadas: Set<String>,
     val noListadasConservadas: Set<String>,
+    val respaldadasPorFicha: Set<String> = emptySet(),
 ) {
-    /** Ninguna familia de la tabla aguanta ese numero: casi siempre es un error de conteo. */
-    val sinFamiliaCompatible: Boolean get() = deLaTabla.isEmpty()
+    /**
+     * Ni la tabla ni la ficha de ninguna especie cargada aguantan ese numero:
+     * casi siempre es un error de conteo.
+     */
+    val sinFamiliaCompatible: Boolean get() = deLaTabla.isEmpty() && respaldadasPorFicha.isEmpty()
 
     /** Hay familias compatibles, pero ninguna tiene especies en esta version de la app. */
-    val sinEspeciesCargadas: Boolean get() = deLaTabla.isNotEmpty() && conEspeciesCargadas.isEmpty()
+    val sinEspeciesCargadas: Boolean
+        get() = deLaTabla.isNotEmpty() && conEspeciesCargadas.isEmpty() && respaldadasPorFicha.isEmpty()
+}
+
+/**
+ * Familias con alguna especie de [especies] cuya PROPIA ficha admite [valor]
+ * en el conteo de [ancla]. La tabla por familia no puede descartarlas: la
+ * ficha es mas especifica que la tabla, y cuando no coinciden la que se
+ * equivoca es la tabla — los miomeros del texto de Leptocephalus holti
+ * (95-120) contra las vertebras de Cyematidae (70-80), o una aleta cuyas
+ * espinas y blandos vienen cada uno con su error de conteo. Es la misma
+ * regla que [CoarseFilter.noListadas]: la tabla no le gana a un dato mas
+ * especifico.
+ */
+fun familiasRespaldadas(especies: List<Species>, ancla: Ancla, valor: Double): Set<String> =
+    especies.filter { admiteConteoDeTabla(it, ancla, valor) }.mapTo(mutableSetOf()) { it.family }
+
+private fun admiteConteoDeTabla(sp: Species, ancla: Ancla, valor: Double): Boolean {
+    val aleta = ALETAS.firstOrNull { it.tablaFamilia == ancla.tablaFamilia }
+        ?: return rangoDe(sp, ancla.clave)?.contains(valor, toleranciaConteo(sp, ancla.clave)) ?: false
+    // La tabla va contra espinas + blandos: dos conteos, cada uno con su error.
+    val radios = sp.rangeFor(aleta.radios) ?: return false
+    val espinas = sp.rangeFor(aleta.espinas) ?: return false
+    return Range(radios.min + espinas.min, radios.max + espinas.max).contains(valor, 2 * TOLERANCIA_CONTEO)
 }
 
 /**
  * Efecto de aplicar [valor] a la tabla [tabla], sobre el filtro [previas]
  * (null = todavia sin filtrar). null si el bundle no trae esa tabla: sin
- * tabla, el conteo solo sirve a nivel especie.
+ * tabla, el conteo solo sirve a nivel especie. [respaldadas] son las
+ * familias que la tabla nunca descarta (ver [familiasRespaldadas]).
  */
 fun efectoEnFamilias(
     coarse: CoarseFilter,
@@ -290,11 +320,12 @@ fun efectoEnFamilias(
     valor: Double,
     previas: Set<String>?,
     familiasCargadas: Set<String>,
+    respaldadas: Set<String> = emptySet(),
 ): EfectoEnFamilias? {
     if (tabla !in coarse.tables) return null
     val compatibles = coarse.families(tabla, valor)
     val noListadas = coarse.noListadas(tabla, familiasCargadas)
-    val base = compatibles + noListadas
+    val base = compatibles + noListadas + respaldadas
     val nuevas = previas?.let { it intersect base } ?: base
     val deLaTabla = nuevas intersect compatibles
     return EfectoEnFamilias(
@@ -302,6 +333,7 @@ fun efectoEnFamilias(
         deLaTabla = deLaTabla,
         conEspeciesCargadas = deLaTabla intersect familiasCargadas,
         noListadasConservadas = nuevas intersect noListadas,
+        respaldadasPorFicha = (nuevas intersect respaldadas) - compatibles - noListadas,
     )
 }
 

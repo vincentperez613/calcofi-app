@@ -33,24 +33,24 @@ data class Range(val min: Double, val max: Double) {
 /**
  * Cuantos ejemplares respaldan los datos de una etapa.
  * kind == "literature" significa que el atlas no midio nada propio.
+ *
+ * No calibra la tolerancia de los conteos: son las larvas que el atlas
+ * describio en esa etapa, y los rangos meristicos (vertebras, radios) son de
+ * la especie, de la literatura. Un n chico de larvas no hace menos
+ * confiable un conteo de radios.
  */
-data class SampleSize(val kind: String, val n: Int) {
-    /**
-     * Tolerancia derivada del respaldo. Evita tratar un rango de n=3 con la
-     * misma confianza que uno de n=200.
-     */
-    val tolerance: Double
-        get() = when {
-            kind == "literature" || n == 0 -> 2.0
-            n < 5 -> 2.0
-            n < 15 -> 1.0
-            else -> 0.5
-        }
+data class SampleSize(val kind: String, val n: Int)
 
-    companion object {
-        val UNKNOWN = SampleSize("unknown", 0)
-    }
-}
+/**
+ * Talla (BL, mm) en que la ficha ubica una etapa: de la eclosion al inicio de
+ * la flexion para preflexion, la flexion misma, y del fin de la flexion a la
+ * transformacion para postflexion. Sale de "Hatching/Flexion/Transformation
+ * length" del bloque LARVAE (package_app.stage_windows en el pipeline).
+ *
+ * Cualquiera de los dos extremos puede faltar: "Hatching length: <2.3 mm" no
+ * fija un minimo, y un extremo que el atlas no da no restringe nada.
+ */
+data class VentanaTalla(val min: Double?, val max: Double?)
 
 /**
  * Caracter cualitativo del texto diagnostico (pigmento, posicion de aleta).
@@ -98,6 +98,8 @@ data class Species(
     val diagnostic: Map<String, DiagnosticChar>,
     val sampleSizes: Map<String, SampleSize>,
     val lifeHistory: LifeHistory? = null,
+    /** Por codigo de etapa ("PrF", "F", "PoF"), como [sampleSizes]. */
+    val stageSizes: Map<String, VentanaTalla> = emptyMap(),
 ) {
     val genus: String get() = species.substringBefore(' ')
 
@@ -111,9 +113,6 @@ data class Species(
      * via rangoDe, nunca via esta funcion.
      */
     fun rangeFor(key: String): Range? = meristics[key] ?: diagnostic[key]?.range
-
-    fun toleranceFor(stage: Stage): Double =
-        (sampleSizes[stage.code] ?: SampleSize.UNKNOWN).tolerance
 }
 
 /**

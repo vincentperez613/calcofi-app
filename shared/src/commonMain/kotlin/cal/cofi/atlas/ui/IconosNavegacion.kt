@@ -6,15 +6,20 @@ import androidx.compose.material3.LocalContentColor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathOperation
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
+import kotlin.math.PI
+import kotlin.math.cos
+import kotlin.math.sin
 
 /**
  * material-icons-extended no esta en las dependencias del proyecto. En vez
- * de agregarla solo para dos iconos de la barra de navegacion, se dibujan a
+ * de agregarla solo para unos pocos iconos (navegacion y modo), se dibujan a
  * mano con Canvas — mismo patron que las 3 ilustraciones de etapa en
  * PantallaCaptura.kt. Leen LocalContentColor.current para heredar el tinte
  * seleccionado/no-seleccionado que NavigationBarItem/NavigationRailItem ya
@@ -69,6 +74,64 @@ fun IconoHistorial(modifier: Modifier = Modifier) {
             color = color,
             start = centro,
             end = Offset(centro.x + radio * 0.4f, centro.y),
+            strokeWidth = grosor,
+            cap = StrokeCap.Round,
+        )
+    }
+}
+
+/** Media luna: un disco al que otro disco le muerde la esquina superior derecha. */
+@Composable
+fun IconoLuna(modifier: Modifier = Modifier) {
+    val color = LocalContentColor.current
+    Canvas(modifier = modifier.size(24.dp)) {
+        val radio = size.minDimension * 0.38f
+        val centro = Offset(size.width * 0.5f, size.height * 0.5f)
+        val disco = Path().apply { addOval(Rect(centro, radio)) }
+        val mordida = Path().apply {
+            addOval(Rect(Offset(centro.x + radio * 0.55f, centro.y - radio * 0.45f), radio * 0.85f))
+        }
+        drawPath(Path.combine(PathOperation.Difference, disco, mordida), color = color)
+    }
+}
+
+/** Sol: un circulo con ocho rayos. */
+@Composable
+fun IconoSol(modifier: Modifier = Modifier) {
+    val color = LocalContentColor.current
+    Canvas(modifier = modifier.size(24.dp)) {
+        val grosor = size.minDimension * 0.09f
+        val centro = Offset(size.width * 0.5f, size.height * 0.5f)
+        drawCircle(color = color, radius = size.minDimension * 0.18f, center = centro, style = Stroke(width = grosor))
+        for (i in 0 until 8) {
+            val angulo = i * PI / 4
+            val dx = cos(angulo).toFloat()
+            val dy = sin(angulo).toFloat()
+            drawLine(
+                color = color,
+                start = Offset(centro.x + dx * size.minDimension * 0.31f, centro.y + dy * size.minDimension * 0.31f),
+                end = Offset(centro.x + dx * size.minDimension * 0.44f, centro.y + dy * size.minDimension * 0.44f),
+                strokeWidth = grosor,
+                cap = StrokeCap.Round,
+            )
+        }
+    }
+}
+
+/** Una "i" dentro de un circulo, el signo convencional de "informacion". */
+@Composable
+fun IconoAcerca(modifier: Modifier = Modifier) {
+    val color = LocalContentColor.current
+    Canvas(modifier = modifier.size(24.dp)) {
+        val grosor = size.minDimension * 0.1f
+        val radio = size.minDimension * 0.4f
+        val centro = Offset(size.width * 0.5f, size.height * 0.5f)
+        drawCircle(color = color, radius = radio, center = centro, style = Stroke(width = grosor))
+        drawCircle(color = color, radius = grosor * 0.7f, center = Offset(centro.x, centro.y - radio * 0.45f))
+        drawLine(
+            color = color,
+            start = Offset(centro.x, centro.y - radio * 0.1f),
+            end = Offset(centro.x, centro.y + radio * 0.5f),
             strokeWidth = grosor,
             cap = StrokeCap.Round,
         )

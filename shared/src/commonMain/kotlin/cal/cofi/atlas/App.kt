@@ -1,15 +1,17 @@
 package cal.cofi.atlas
 
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationRail
@@ -28,19 +30,24 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import cal.cofi.atlas.ui.Almacen
 import cal.cofi.atlas.ui.Ancho
+import cal.cofi.atlas.ui.BotonModo
 import cal.cofi.atlas.ui.CapturaState
 import cal.cofi.atlas.ui.ContenedorPantalla
+import cal.cofi.atlas.ui.IconoAcerca
 import cal.cofi.atlas.ui.IconoAnalisis
 import cal.cofi.atlas.ui.IconoEspecies
 import cal.cofi.atlas.ui.IconoHistorial
 import cal.cofi.atlas.ui.LocalAncho
 import cal.cofi.atlas.ui.LocalDimensiones
+import cal.cofi.atlas.ui.PantallaAcerca
 import cal.cofi.atlas.ui.PantallaCaptura
 import cal.cofi.atlas.ui.PantallaEspecies
 import cal.cofi.atlas.ui.PantallaHistorial
 import cal.cofi.atlas.ui.PantallaPregunta
 import cal.cofi.atlas.ui.PantallaResultado
+import cal.cofi.atlas.ui.Preferencias
 import cal.cofi.atlas.ui.ProveedorDeLayout
+import cal.cofi.atlas.ui.TemaAtlas
 
 /** Los pasos DENTRO de la seccion Analisis. App.kt es, por ahora, el unico dueno de en cual estamos. */
 private enum class PasoId { CAPTURA, PREGUNTA, RESULTADO }
@@ -66,12 +73,17 @@ private data class DatosResultado(
 )
 
 /** Las secciones de la app, elegidas desde la barra de navegacion en App.kt. */
-private enum class Seccion { ANALISIS, ESPECIES, HISTORIAL }
+private enum class Seccion { ANALISIS, ESPECIES, HISTORIAL, ACERCA }
 
 @Composable
 @Preview
 fun App() {
-    MaterialTheme {
+    // null: el tecnico nunca eligio, asi que manda el modo del sistema (y lo
+    // sigue si cambia). Una vez que elige, se queda con eso entre sesiones.
+    var modoElegido by remember { mutableStateOf(Preferencias.modoOscuro()) }
+    val oscuro = modoElegido ?: isSystemInDarkTheme()
+
+    TemaAtlas(oscuro) {
         ProveedorDeLayout {
             val repositorio = remember { AtlasRepository() }
             val estadoCarga by repositorio.estado.collectAsState()
@@ -81,14 +93,21 @@ fun App() {
             when (val estado = estadoCarga) {
                 is EstadoCarga.Cargando -> MensajeCentrado("Loading atlas...")
                 is EstadoCarga.Error -> MensajeCentrado("Failed to load the atlas: ${estado.mensaje}")
-                is EstadoCarga.Listo -> AppConNavegacion(estado.data)
+                is EstadoCarga.Listo -> AppConNavegacion(
+                    data = estado.data,
+                    oscuro = oscuro,
+                    onModo = {
+                        modoElegido = it
+                        Preferencias.guardarModoOscuro(it)
+                    },
+                )
             }
         }
     }
 }
 
 /**
- * Dueno de la seccion activa (Analisis / Historial) y de la barra que la
+ * Dueno de la seccion activa (Analisis / Especies / Historial / About) y de la barra que la
  * elige: NavigationRail a la izquierda en AMPLIO, NavigationBar abajo en
  * COMPACTO/MEDIO. Las pantallas no conocen esta navegacion.
  *
@@ -100,7 +119,7 @@ fun App() {
  * una identificacion es justo lo que no se puede permitir en campo.
  */
 @Composable
-private fun AppConNavegacion(data: AtlasData) {
+private fun AppConNavegacion(data: AtlasData, oscuro: Boolean, onModo: (Boolean) -> Unit) {
     val ancho = LocalAncho.current
     var seccion by remember { mutableStateOf(Seccion.ANALISIS) }
     var familiaIdentificar by remember { mutableStateOf<String?>(null) }
@@ -111,22 +130,28 @@ private fun AppConNavegacion(data: AtlasData) {
     // padding de la barra de estado se aplicara tambien afuera, se sumaria
     // al que ya aplica el nav — un hueco doble arriba del rail en AMPLIO.
     val contenido: @Composable () -> Unit = {
-        Box(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.statusBars)) {
-            Box(if (seccion == Seccion.ANALISIS) Modifier.fillMaxSize() else Modifier.size(0.dp)) {
-                FlujoAnalisis(data = data, familiaInicial = familiaIdentificar)
-            }
-            Box(if (seccion == Seccion.ESPECIES) Modifier.fillMaxSize() else Modifier.size(0.dp)) {
-                PantallaEspecies(
-                    data = data,
-                    activa = seccion == Seccion.ESPECIES,
-                    onIdentifyFamily = { familia ->
-                        familiaIdentificar = familia
-                        seccion = Seccion.ANALISIS
-                    },
-                )
-            }
-            Box(if (seccion == Seccion.HISTORIAL) Modifier.fillMaxSize() else Modifier.size(0.dp)) {
-                PantallaHistorial(activa = seccion == Seccion.HISTORIAL)
+        Column(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.statusBars)) {
+            BarraSuperior(oscuro, onModo)
+            Box(Modifier.weight(1f).fillMaxWidth()) {
+                Box(if (seccion == Seccion.ANALISIS) Modifier.fillMaxSize() else Modifier.size(0.dp)) {
+                    FlujoAnalisis(data = data, familiaInicial = familiaIdentificar)
+                }
+                Box(if (seccion == Seccion.ESPECIES) Modifier.fillMaxSize() else Modifier.size(0.dp)) {
+                    PantallaEspecies(
+                        data = data,
+                        activa = seccion == Seccion.ESPECIES,
+                        onIdentifyFamily = { familia ->
+                            familiaIdentificar = familia
+                            seccion = Seccion.ANALISIS
+                        },
+                    )
+                }
+                Box(if (seccion == Seccion.HISTORIAL) Modifier.fillMaxSize() else Modifier.size(0.dp)) {
+                    PantallaHistorial(activa = seccion == Seccion.HISTORIAL)
+                }
+                Box(if (seccion == Seccion.ACERCA) Modifier.fillMaxSize() else Modifier.size(0.dp)) {
+                    PantallaAcerca(data)
+                }
             }
         }
     }
@@ -147,6 +172,23 @@ private fun AppConNavegacion(data: AtlasData) {
                 seccion = destino
             })
         }
+    }
+}
+
+/**
+ * Una fila propia arriba de todas las secciones, con el boton de modo a la
+ * derecha. Fila y no boton flotante: encima del contenido taparia lo que
+ * cada pantalla pone en esa esquina (las flechas del carrusel de
+ * resultados, el indicador de fases en un telefono).
+ */
+@Composable
+private fun BarraSuperior(oscuro: Boolean, onModo: (Boolean) -> Unit) {
+    val dimensiones = LocalDimensiones.current
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(end = dimensiones.espaciado / 2),
+        horizontalArrangement = Arrangement.End,
+    ) {
+        BotonModo(oscuro = oscuro, onCambio = onModo)
     }
 }
 
@@ -171,6 +213,12 @@ private fun BarraInferior(seccion: Seccion, onSeccion: (Seccion) -> Unit) {
             icon = { IconoHistorial() },
             label = { Text("History") },
         )
+        NavigationBarItem(
+            selected = seccion == Seccion.ACERCA,
+            onClick = { onSeccion(Seccion.ACERCA) },
+            icon = { IconoAcerca() },
+            label = { Text("About") },
+        )
     }
 }
 
@@ -194,6 +242,12 @@ private fun BarraLateral(seccion: Seccion, onSeccion: (Seccion) -> Unit) {
             onClick = { onSeccion(Seccion.HISTORIAL) },
             icon = { IconoHistorial() },
             label = { Text("History") },
+        )
+        NavigationRailItem(
+            selected = seccion == Seccion.ACERCA,
+            onClick = { onSeccion(Seccion.ACERCA) },
+            icon = { IconoAcerca() },
+            label = { Text("About") },
         )
     }
 }

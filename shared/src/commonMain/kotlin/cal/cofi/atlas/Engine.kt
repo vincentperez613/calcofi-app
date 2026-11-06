@@ -38,6 +38,13 @@ data class Candidate(
     val species: Species,
     val supporting: List<String>,
     val contradicting: List<String>,
+    /**
+     * De [supporting], los que solo entraron gracias a la tolerancia: el
+     * valor cae fuera del rango publicado, pero dentro del margen por error
+     * de conteo (o de la holgura de talla). Cuentan a favor igual — solo
+     * deciden el orden entre empatados.
+     */
+    val marginal: List<String> = emptyList(),
 ) {
     val evaluated: Int get() = supporting.size + contradicting.size
     val score: Double get() = if (evaluated == 0) 0.0 else supporting.size.toDouble() / evaluated
@@ -45,10 +52,17 @@ data class Candidate(
 
 enum class TaxonLevel { SPECIES, GENUS, FAMILY, UNRESOLVED }
 
+/**
+ * [tied] son los candidatos que comparten el titular (uno solo si
+ * [level] es SPECIES), en el orden de [candidates]. Con UNRESOLVED
+ * [label] los nombra a todos: pueden ser cientos si casi todo se contesto
+ * "no se", asi que la UI cuenta [tied] en vez de mostrar [label] entero.
+ */
 data class Identification(
     val label: String,
     val level: TaxonLevel,
     val candidates: List<Candidate>,
+    val tied: List<Candidate> = emptyList(),
 )
 
 /**
@@ -131,12 +145,62 @@ fun clavesComparables(sp: Species): Set<String> = buildSet {
     if (rangoMiomerosTotales(sp) != null) add(MIOMEROS_TOTALES)
 }
 
+/** Error de conteo del tecnico: un miomero o un radio de mas o de menos. */
+const val TOLERANCIA_CONTEO = 1.0
+
 /**
- * Tolerancia de un conteo: la derivada del tamaño de muestra, pero nunca
- * menos de +-1 (error de conteo del tecnico) ni mas de +-3.
+ * Margen extra cuando los miomeros se comparan contra las VERTEBRAS
+ * ([VERTEBRAS_SUSTITUYEN_MIOMEROS]): en las 67 fichas que traen las dos
+ * cosas los rangos siempre se traslapan, pero el de miomeros se sale del de
+ * vertebras por 1 en un tercio de ellas y por 2 en unas pocas. +-1 aqui
+ * bajaria los matches en preflexion (~57 -> ~46 en la simulacion), al costo
+ * de perder a la especie correcta un punto mas seguido.
  */
-private fun toleranciaConteo(sp: Species, stage: Stage): Double =
-    sp.toleranceFor(stage).coerceIn(1.0, 3.0)
+const val TOLERANCIA_SUSTITUTO_VERTEBRAL = 2.0
+
+/** Si [sp] no trae miomeros y el motor compara contra sus vertebras. */
+fun usaSustitutoVertebral(sp: Species): Boolean =
+    VERTEBRAS_SUSTITUYEN_MIOMEROS &&
+        sp.rangeFor(MIOMEROS_TOTALES) == null && sp.rangeFor("Myomeres: Total") == null &&
+        sp.rangeFor("Vertebrae: Total") != null
+
+/**
+ * Tolerancia de un conteo de [character] contra la ficha de [sp]. Es fija y
+ * no sale del tamaño de muestra (ver [SampleSize]): el rango publicado ya es
+ * el de la especie, y lo unico que hay que absorber es el error de conteo.
+ */
+internal fun toleranciaConteo(sp: Species, character: String): Double =
+    if (claveCanonica(character) == MIOMEROS_TOTALES && usaSustitutoVertebral(sp)) {
+        TOLERANCIA_SUSTITUTO_VERTEBRAL
+    } else {
+        TOLERANCIA_CONTEO
+    }
+
+// --------------------------------------------------------- talla x etapa
+
+/**
+ * Clave con la que la talla (BL) cuenta como caracter: a favor si cae en la
+ * ventana de la ficha para la etapa elegida ([Species.stageSizes]), en contra
+ * si no. No es una pregunta: la talla se captura siempre, antes del
+ * interrogatorio.
+ */
+const val TALLA_ETAPA = "body_length_at_stage"
+
+/**
+ * Holgura de la ventana de talla: 25% (minimo 0.5 mm). Cubre el
+ * encogimiento por formol y que la ventana sale de pocas larvas. Validada
+ * contra los pies de figura del atlas: de 513 larvas dibujadas con etapa y
+ * talla, 1 cae fuera de la ventana de su especie con esta holgura (14 sin
+ * ella).
+ */
+const val HOLGURA_TALLA = 0.25
+const val HOLGURA_TALLA_MIN_MM = 0.5
+
+private fun VentanaTalla.admite(tallaMm: Double, holgura: Boolean): Boolean {
+    val bajo = min?.let { if (holgura) minOf(it * (1 - HOLGURA_TALLA), it - HOLGURA_TALLA_MIN_MM) else it }
+    val alto = max?.let { if (holgura) maxOf(it * (1 + HOLGURA_TALLA), it + HOLGURA_TALLA_MIN_MM) else it }
+    return (bajo == null || tallaMm >= bajo) && (alto == null || tallaMm <= alto)
+}
 
 // -------------------------------------------------------------------- aletas
 
@@ -175,6 +239,20 @@ class IdentificationEngine(private val data: AtlasData) {
     private fun evaluate(sp: Species, stage: Stage, obs: List<Observation>, tallaMm: Double?): Candidate {
         val ok = mutableListOf<String>()
         val bad = mutableListOf<String>()
+        val marginal = mutableListOf<String>()
+
+        // Sin ventana para esta etapa la talla no dice nada de la especie.
+        val ventana = sp.stageSizes[stage.code]
+        if (tallaMm != null && ventana != null) {
+            when {
+                ventana.admite(tallaMm, holgura = false) -> ok.add(TALLA_ETAPA)
+                ventana.admite(tallaMm, holgura = true) -> {
+                    ok.add(TALLA_ETAPA)
+                    marginal.add(TALLA_ETAPA)
+                }
+                else -> bad.add(TALLA_ETAPA)
+            }
+        }
 
         for (o in obs) {
             if (o.isUnknown) continue
@@ -192,14 +270,28 @@ class IdentificationEngine(private val data: AtlasData) {
             }
 
             val r = rangoDe(sp, o.character) ?: continue  // no penaliza
-            (if (r.contains(o.value!!, toleranciaConteo(sp, stage))) ok else bad).add(o.character)
+            val v = o.value!!
+            when {
+                r.contains(v, 0.0) -> ok.add(o.character)
+                r.contains(v, toleranciaConteo(sp, o.character)) -> {
+                    ok.add(o.character)
+                    marginal.add(o.character)
+                }
+                else -> bad.add(o.character)
+            }
         }
-        return Candidate(sp, ok, bad)
+        return Candidate(sp, ok, bad, marginal)
     }
 
     /**
      * Ordena candidatos. NO elimina: un solo caracter fuera de rango no debe
      * descartar a la especie correcta, que es el modo de falla a evitar.
+     *
+     * Entre los que empatan en score va primero el que tiene mas evidencia,
+     * y a igual evidencia el que necesito menos tolerancia ([Candidate.marginal]).
+     * No cambia cuantos matches hay, solo cual se ve primero: en la
+     * simulacion sobre el atlas, la especie correcta queda primera en
+     * postflexion ~79% de las veces contra ~62% sin el ultimo criterio.
      */
     fun rank(
         stage: Stage,
@@ -212,7 +304,8 @@ class IdentificationEngine(private val data: AtlasData) {
 
         return pool.map { evaluate(it, stage, obs, tallaMm) }
             .sortedWith(compareByDescending<Candidate> { it.score }
-                .thenByDescending { it.evaluated })
+                .thenByDescending { it.evaluated }
+                .thenBy { it.marginal.size })
     }
 
     /**
@@ -263,18 +356,18 @@ class IdentificationEngine(private val data: AtlasData) {
         val tied = base.filter { abs(best - it.score) < 1e-9 }
 
         if (tied.size == 1) {
-            return Identification(tied.first().species.species, TaxonLevel.SPECIES, ranked)
+            return Identification(tied.first().species.species, TaxonLevel.SPECIES, ranked, tied)
         }
         val genera = tied.map { it.species.genus }.toSet()
         if (genera.size == 1) {
-            return Identification("${genera.first()} sp.", TaxonLevel.GENUS, ranked)
+            return Identification("${genera.first()} sp.", TaxonLevel.GENUS, ranked, tied)
         }
         val fams = tied.map { it.species.family }.toSet()
         if (fams.size == 1) {
-            return Identification(fams.first(), TaxonLevel.FAMILY, ranked)
+            return Identification(fams.first(), TaxonLevel.FAMILY, ranked, tied)
         }
         val nombres = tied.map { it.species.species }.sorted().joinToString(" / ")
-        return Identification(nombres, TaxonLevel.UNRESOLVED, ranked)
+        return Identification(nombres, TaxonLevel.UNRESOLVED, ranked, tied)
     }
 
     // --------------------------------------------------- pregunta adaptativa
@@ -285,7 +378,6 @@ class IdentificationEngine(private val data: AtlasData) {
     private fun expectedRemaining(
         pool: List<Candidate>,
         character: String,
-        stage: Stage,
         tallaMm: Double?,
     ): Double {
         // Categorico (p.ej. hindgut_pigment: "present"/"absent", o una
@@ -326,7 +418,7 @@ class IdentificationEngine(private val data: AtlasData) {
                 // Mismo rango y misma tolerancia que evaluate(): seleccion y
                 // evaluacion tienen que razonar igual.
                 val r = rangoDe(c.species, character)
-                r == null || r.contains(v, toleranciaConteo(c.species, stage))
+                r == null || r.contains(v, toleranciaConteo(c.species, character))
             }
         }
         return total / probes
@@ -376,7 +468,7 @@ class IdentificationEngine(private val data: AtlasData) {
         // sin esto el orden depende de la iteracion de un LinkedHashSet, que
         // depende de como Loader.kt arma los mapas desde el JSON — no
         // reproducible entre corridas si cambian los datos.
-        val puntuados = keys.map { it to expectedRemaining(pool, it, stage, tallaMm) }
+        val puntuados = keys.map { it to expectedRemaining(pool, it, tallaMm) }
         val (best, mejorEsperado) = puntuados.minWithOrNull(compareBy({ it.second }, { it.first })) ?: return null
         // regla de paro: si la mejor pregunta no reduce nada, ninguna lo hara
         if (mejorEsperado >= pool.size - 0.05) return null
@@ -411,12 +503,15 @@ val AVAILABLE_AT_STAGE: Map<Stage, Set<String>> = mapOf(
  * A que clase pertenece cada caracter, para el filtro por etapa y para la
  * fase del interrogatorio (Interrogatorio.kt).
  *
- * La clase "shape" existe pero todavia no tiene caracteres: no esta decidido
- * de donde salen las categorias de forma. Cuando lleguen como entradas de
- * "diagnostic" con "value" categorico, se agregan aca con clase "shape" y
- * su redaccion en PROMPTS/OPCIONES_CATEGORICAS.
+ * La clase "shape" por ahora solo tiene gut_length. Un caracter de forma
+ * nuevo llega como entrada de "diagnostic" con "value" categorico; se agrega
+ * aca con clase "shape" y su redaccion en PROMPTS/OPCIONES_CATEGORICAS.
  */
 val CHARACTER_CLASS: Map<String, String> = mapOf(
+    // Donde queda el ano: antes ("short") o despues ("long") de la mitad del
+    // cuerpo. Se ve desde la eclosion. Lo extrae el pipeline del texto
+    // diagnostico, solo cuando es inequivoco (~30 especies).
+    "gut_length" to "shape",
     "myomeres_total" to "myomeres",
     "myomeres_preanal" to "myomeres",
     "myomeres_postanal" to "myomeres",

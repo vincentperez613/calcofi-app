@@ -6,6 +6,7 @@ import cal.cofi.atlas.EstadoCarga
 import cal.cofi.atlas.Fase
 import cal.cofi.atlas.MIOMEROS_TOTALES
 import cal.cofi.atlas.Stage
+import cal.cofi.atlas.TALLA_ETAPA
 import cal.cofi.atlas.interrogar
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
@@ -57,9 +58,16 @@ class SesionAdaptativaTest {
             r.identificacion.candidates.map { it.species.id }.toSet(),
             "todas las especies deberian seguir vivas cuando nada se responde",
         )
-        assertTrue(r.identificacion.candidates.all { it.supporting.isEmpty() && it.contradicting.isEmpty() })
+        // La talla se captura siempre, antes de preguntar: es la unica
+        // evidencia que queda, y solo para las especies con ventana.
+        assertTrue(
+            r.identificacion.candidates.all { c -> (c.supporting + c.contradicting).all { it == TALLA_ETAPA } },
+        )
         // "No se" a un conteo con tabla tampoco filtra familias.
         assertEquals(null, r.final.familias)
+
+        val sinTalla = interrogar(data, Stage.POF, REGLAS_APP, emptyMap(), tallaMm = null)
+        assertTrue(sinTalla.identificacion.candidates.all { it.supporting.isEmpty() && it.contradicting.isEmpty() })
     }
 }
 
@@ -73,6 +81,8 @@ class SesionAdaptativaTest {
 class IdentificacionCompletaTest {
 
     private val engraulisMordax: Map<String, Any> = mapOf(
+        // Intestino largo y recto, el ano muy atras: como cualquier engraulido.
+        "gut_length" to "long",
         MIOMEROS_TOTALES to 45.0,
         "myomeres_preanal" to 28.0,
         "Anal spines" to 0.0, "Anal rays" to 22.0,
@@ -98,11 +108,12 @@ class IdentificacionCompletaTest {
             println("  ${c.species.species}: ${(c.score * 100).toInt()}% a favor=${c.supporting} en contra=${c.contradicting}")
         }
 
-        // Orden: las fases nunca retroceden, y los miomeros van primero.
+        // Orden: las fases nunca retroceden; primero la forma (el intestino),
+        // y dentro de Meristica los miomeros van primero.
         val fases = r.preguntas.map { it.fase }
         assertEquals(fases.sortedBy { it.ordinal }, fases)
-        assertEquals(MIOMEROS_TOTALES, r.preguntas.first().clave)
-        assertTrue(Fase.FORMA !in fases, "el bundle no trae caracteres de forma: la fase se salta")
+        assertEquals("gut_length", r.preguntas.first().clave)
+        assertEquals(MIOMEROS_TOTALES, r.preguntas.first { it.fase == Fase.MIOMEROS }.clave)
         // Cada conteo una sola vez.
         val claves = r.preguntas.flatMap { it.claves }
         assertEquals(claves.toSet().size, claves.size, "claves repetidas: $claves")
@@ -110,5 +121,7 @@ class IdentificacionCompletaTest {
         val primero = r.identificacion.candidates.first()
         assertEquals("engraulis_mordax", primero.species.id)
         assertTrue(primero.contradicting.isEmpty(), "E. mordax no deberia tener nada en contra: ${primero.contradicting}")
+        assertTrue(TALLA_ETAPA in primero.supporting, "18.4 mm cae en la postflexion de su ficha")
+        assertEquals(1, r.identificacion.tied.size, "matches: ${r.identificacion.tied.map { it.species.species }}")
     }
 }

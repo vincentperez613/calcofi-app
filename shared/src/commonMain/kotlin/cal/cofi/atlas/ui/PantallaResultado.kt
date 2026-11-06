@@ -1,26 +1,44 @@
 package cal.cofi.atlas.ui
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.pager.VerticalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
 import cal.cofi.atlas.AtlasData
 import cal.cofi.atlas.Candidate
 import cal.cofi.atlas.Distribucion
@@ -44,14 +62,14 @@ import org.jetbrains.compose.resources.decodeToImageBitmap
 /**
  * Tercera y ultima pantalla del flujo: el resultado de
  * IdentificationEngine.resolve(stage, obs, tallaMm), ya calculado por
- * PantallaPregunta cuando el interrogatorio termino. Muestra el titular con
- * el nivel taxonomico en palabras (nunca un enum crudo), los tres mejores
- * candidatos con su evidencia para que un revisor pueda auditar el porque,
- * y la lamina recortada del atlas para el mejor candidato.
+ * PantallaPregunta cuando el interrogatorio termino. Arriba, fijo, cuantas
+ * coincidencias hay; abajo, un carrusel vertical con una tarjeta por
+ * coincidencia: la lamina recortada del atlas, la evidencia para que un
+ * revisor pueda auditar el porque, y el riesgo de error.
  *
- * Cada candidato lleva ademas su riesgo de error por temporada y
- * distribucion (Riesgo.kt), con el texto del atlas al lado. Acompaña al
- * resultado: no cambia el orden, no quita a nadie y no toca el titular.
+ * El riesgo de error por temporada y distribucion (Riesgo.kt) va con el
+ * texto del atlas al lado. Acompaña al resultado: no cambia el orden, no
+ * quita a nadie y no toca el titular.
  */
 @Composable
 fun PantallaResultado(
@@ -67,7 +85,6 @@ fun PantallaResultado(
     onNuevaCaptura: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val ancho = LocalAncho.current
     val dimensiones = LocalDimensiones.current
     val alcance = rememberCoroutineScope()
 
@@ -135,85 +152,113 @@ fun PantallaResultado(
         return
     }
 
-    val especiePrincipal = identificacionActual.candidates.firstOrNull()?.species
-
-    val panelFigura: @Composable () -> Unit = {
-        if (especiePrincipal != null) {
-            PanelFigura(data, especiePrincipal, stage, dimensiones)
-        }
-    }
-    val panelCandidatos: @Composable () -> Unit = {
-        PanelCandidatosResultado(
-            top3 = identificacionActual.candidates.take(3),
-            mesColecta = mesColecta,
-            zonaColecta = zonaColecta,
-            distribuciones = distribuciones,
-            onDistribucion = { especie, valor ->
-                distribuciones = distribuciones + (especie.species to valor)
-                Almacen.registrarRiesgo(sesionId, especie.species, evaluarRiesgo(mesColecta, especie.lifeHistory, valor))
-            },
-            dimensiones = dimensiones,
-        )
+    // Almacen solo guarda los tres primeros del ranking (top1..top3 del CSV).
+    val guardadas = remember(identificacionActual) {
+        identificacionActual.candidates.take(3).mapTo(mutableSetOf()) { it.species.species }
     }
 
-    ContenedorPantalla(modifier) {
-        Titular(identificacionActual, dimensiones)
-
-        if (ancho == Ancho.AMPLIO) {
-            Row(horizontalArrangement = Arrangement.spacedBy(dimensiones.espaciado)) {
-                Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(dimensiones.espaciado),
-                ) { panelFigura() }
-                Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(dimensiones.espaciado),
-                ) { panelCandidatos() }
-            }
-        } else {
-            panelFigura()
-            panelCandidatos()
+    ContenedorPantalla(modifier, desplazable = false) {
+        // La clave vuelve el carrusel a la primera tarjeta si el resultado
+        // se recalcula sin el filtro de familia.
+        key(identificacionActual) {
+            CarruselCoincidencias(
+                data = data,
+                stage = stage,
+                identificacion = identificacionActual,
+                guardadas = guardadas,
+                mesColecta = mesColecta,
+                zonaColecta = zonaColecta,
+                distribuciones = distribuciones,
+                onDistribucion = { especie, valor ->
+                    distribuciones = distribuciones + (especie.species to valor)
+                    Almacen.registrarRiesgo(sesionId, especie.species, evaluarRiesgo(mesColecta, especie.lifeHistory, valor))
+                },
+                dimensiones = dimensiones,
+                modifier = Modifier.weight(1f),
+            )
         }
-
         BotonPrincipal(texto = "New specimen", onClick = onNuevaCaptura)
     }
 }
 
-// ------------------------------------------------------------------ titular
+// ------------------------------------------------------------ coincidencias
 
+/**
+ * Las coincidencias son los candidatos que comparten el titular
+ * (Identification.tied): una sola, o varias — cientos si casi todo se
+ * contesto "no se". Arriba solo se dice cuantas son, nunca "sin resolver":
+ * eso no le dice nada al tecnico, las tarjetas si.
+ *
+ * Carrusel vertical: una tarjeta por coincidencia, con la siguiente
+ * asomando abajo para que se note que hay mas. Cada tarjeta scrollea por
+ * dentro (el riesgo y el texto del atlas no caben en un telefono); al
+ * llegar a su final, el mismo gesto pasa a la siguiente. Las flechas hacen
+ * lo mismo sin deslizar — con guantes mojados, o con mouse en escritorio.
+ */
 @Composable
-private fun Titular(id: Identification, dimensiones: Dimensiones) {
-    Column(verticalArrangement = Arrangement.spacedBy(dimensiones.espaciado / 2)) {
-        TituloPantalla(id.label)
-        val nota = when (id.level) {
-            TaxonLevel.SPECIES -> null
-            TaxonLevel.GENUS -> "The characters recorded only resolve to genus."
-            TaxonLevel.FAMILY -> "The characters recorded only resolve to family."
-            TaxonLevel.UNRESOLVED -> "No candidate is separated from the others by the characters recorded."
-        }
-        if (nota != null) {
-            Text(nota, fontSize = dimensiones.tamanoTextoBase, fontStyle = FontStyle.Italic)
-        }
-    }
-}
-
-// --------------------------------------------------------------- candidatos
-
-@Composable
-private fun PanelCandidatosResultado(
-    top3: List<Candidate>,
+private fun CarruselCoincidencias(
+    data: AtlasData,
+    stage: Stage,
+    identificacion: Identification,
+    guardadas: Set<String>,
     mesColecta: Int?,
     zonaColecta: String?,
     distribuciones: Map<String, Distribucion>,
     onDistribucion: (Species, Distribucion) -> Unit,
     dimensiones: Dimensiones,
+    modifier: Modifier = Modifier,
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(dimensiones.espaciado)) {
-        Text("Candidates", fontSize = dimensiones.tamanoTextoTitulo, fontWeight = FontWeight.Bold)
-        for (c in top3) {
-            TarjetaCandidatoResultado(c, dimensiones)
-            SeccionRiesgo(
-                especie = c.species,
+    val tarjetas = identificacion.tied
+    if (tarjetas.isEmpty()) {
+        TituloPantalla("No matches")
+        return
+    }
+    val estado = rememberPagerState { tarjetas.size }
+    val alcance = rememberCoroutineScope()
+    val varias = tarjetas.size > 1
+
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(dimensiones.espaciado / 2)) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(dimensiones.espaciado / 2),
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                TituloPantalla(conteo(tarjetas.size, "match", "matches"))
+                if (varias) {
+                    Text("Showing ${estado.currentPage + 1} of ${tarjetas.size}", fontSize = dimensiones.tamanoTextoBase)
+                }
+            }
+            if (varias) {
+                BotonFlecha("▲", "Previous match", habilitado = estado.currentPage > 0) {
+                    alcance.launch { estado.animateScrollToPage(estado.currentPage - 1) }
+                }
+                BotonFlecha("▼", "Next match", habilitado = estado.currentPage < tarjetas.size - 1) {
+                    alcance.launch { estado.animateScrollToPage(estado.currentPage + 1) }
+                }
+            }
+        }
+        // Si todas caen en un mismo genero o familia, eso ya es un resultado.
+        val grupo = when (identificacion.level) {
+            TaxonLevel.GENUS -> "All in genus ${tarjetas.first().species.genus}."
+            TaxonLevel.FAMILY -> "All in family ${tarjetas.first().species.family}."
+            else -> null
+        }
+        grupo?.let { Text(it, fontSize = dimensiones.tamanoTextoBase, fontStyle = FontStyle.Italic) }
+
+        VerticalPager(
+            state = estado,
+            modifier = Modifier.weight(1f).fillMaxWidth(),
+            // Este hueco es lo que asoma de la tarjeta siguiente.
+            contentPadding = PaddingValues(bottom = if (varias) dimensiones.alturaBotonMinima else 0.dp),
+            pageSpacing = dimensiones.espaciado / 2,
+            key = { tarjetas[it].species.id },
+        ) { pagina ->
+            val c = tarjetas[pagina]
+            TarjetaCandidato(
+                data = data,
+                stage = stage,
+                candidato = c,
+                guardada = c.species.species in guardadas,
                 mesColecta = mesColecta,
                 zonaColecta = zonaColecta,
                 distribucion = distribuciones[c.species.species] ?: Distribucion.NO_SE,
@@ -221,6 +266,112 @@ private fun PanelCandidatosResultado(
                 dimensiones = dimensiones,
             )
         }
+    }
+}
+
+@Composable
+private fun BotonFlecha(simbolo: String, descripcion: String, habilitado: Boolean, onClick: () -> Unit) {
+    val dimensiones = LocalDimensiones.current
+    OutlinedButton(
+        onClick = onClick,
+        enabled = habilitado,
+        modifier = Modifier
+            .heightIn(min = dimensiones.alturaBotonMinima)
+            .widthIn(min = dimensiones.alturaBotonMinima),
+    ) {
+        Text(
+            simbolo,
+            fontSize = dimensiones.tamanoTextoBase,
+            modifier = Modifier.clearAndSetSemantics { contentDescription = descripcion },
+        )
+    }
+}
+
+/**
+ * Todo lo de un candidato en una tarjeta: su figura del atlas para la
+ * etapa, la evidencia para auditar el porque y su riesgo de error. La
+ * figura va en cada tarjeta y no solo en la del primero: comparar los
+ * dibujos de los empatados es lo que le queda al tecnico para desempatar.
+ */
+@Composable
+private fun TarjetaCandidato(
+    data: AtlasData,
+    stage: Stage,
+    candidato: Candidate,
+    guardada: Boolean,
+    mesColecta: Int?,
+    zonaColecta: String?,
+    distribucion: Distribucion,
+    onDistribucion: (Distribucion) -> Unit,
+    dimensiones: Dimensiones,
+) {
+    val ancho = LocalAncho.current
+    val forma = RoundedCornerShape(dimensiones.espaciado)
+    val riesgo: @Composable () -> Unit = {
+        SeccionRiesgo(
+            especie = candidato.species,
+            mesColecta = mesColecta,
+            zonaColecta = zonaColecta,
+            distribucion = distribucion,
+            onDistribucion = onDistribucion,
+            dimensiones = dimensiones,
+        )
+        if (!guardada) {
+            Text(
+                "Not stored in the session record: only the top 3 are.",
+                fontSize = dimensiones.tamanoTextoBase,
+                fontStyle = FontStyle.Italic,
+            )
+        }
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .clip(forma)
+            .border(1.dp, MaterialTheme.colorScheme.outline, forma)
+            .verticalScroll(rememberScrollState())
+            .padding(dimensiones.espaciado),
+        verticalArrangement = Arrangement.spacedBy(dimensiones.espaciado),
+    ) {
+        EncabezadoCandidato(candidato, dimensiones)
+        if (ancho == Ancho.AMPLIO) {
+            Row(horizontalArrangement = Arrangement.spacedBy(dimensiones.espaciado)) {
+                Column(modifier = Modifier.weight(1f)) {
+                    PanelFigura(data, candidato.species, stage, dimensiones)
+                }
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(dimensiones.espaciado),
+                ) {
+                    Evidencia(candidato, dimensiones)
+                    riesgo()
+                }
+            }
+        } else {
+            PanelFigura(data, candidato.species, stage, dimensiones)
+            Evidencia(candidato, dimensiones)
+            riesgo()
+        }
+    }
+}
+
+@Composable
+private fun EncabezadoCandidato(c: Candidate, dimensiones: Dimensiones) {
+    Row(
+        verticalAlignment = Alignment.Top,
+        horizontalArrangement = Arrangement.spacedBy(dimensiones.espaciado),
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(c.species.species, fontSize = dimensiones.tamanoTextoBase * 1.25f, fontWeight = FontWeight.Bold)
+            Text(c.species.family, fontSize = dimensiones.tamanoTextoBase)
+        }
+        Text(
+            "${(c.score * 100).toInt()}%",
+            fontSize = dimensiones.tamanoTextoTitulo,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary,
+        )
     }
 }
 
@@ -296,13 +447,8 @@ private fun textoNivel(nivel: NivelRiesgo): String = when (nivel) {
 }
 
 @Composable
-private fun TarjetaCandidatoResultado(c: Candidate, dimensiones: Dimensiones) {
+private fun Evidencia(c: Candidate, dimensiones: Dimensiones) {
     Column(verticalArrangement = Arrangement.spacedBy(dimensiones.espaciado / 4)) {
-        Text(
-            "${c.species.species} — ${(c.score * 100).toInt()}%",
-            fontSize = dimensiones.tamanoTextoBase,
-            fontWeight = FontWeight.Bold,
-        )
         if (c.supporting.isNotEmpty()) {
             Text(
                 "Supporting: " + c.supporting.joinToString("; ") { traducirCaracter(it) },
@@ -335,8 +481,8 @@ private fun PanelFigura(data: AtlasData, especie: Species, stage: Stage, dimensi
 
 /**
  * Una figura recortada de una lamina, con su rotulo y advertencias —
- * unidad reutilizable entre PantallaResultado (la mejor figura del
- * candidato principal, una por pantalla) y PantallaEspecies (todas las
+ * unidad reutilizable entre PantallaResultado (la mejor figura de cada
+ * candidato, una por tarjeta del carrusel) y PantallaEspecies (todas las
  * figuras de una especie, en el catalogo). No dupliques esto: cualquier
  * pantalla que necesite mostrar una FigureRef pasa por aca.
  */
@@ -420,6 +566,12 @@ private fun RecorteFigura(bitmap: ImageBitmap, figura: FigureRef, dimensiones: D
         tamano = IntSize(bitmap.width, bitmap.height)
     }
 
+    // Papel del color del fondo y tinta del color del texto: en modo oscuro
+    // la lamina sale invertida y sin un rectangulo blanco encima (ver filtroLamina).
+    val papel = MaterialTheme.colorScheme.background
+    val tinta = MaterialTheme.colorScheme.onBackground
+    val filtro = remember(papel, tinta) { filtroLamina(papel, tinta) }
+
     Column(verticalArrangement = Arrangement.spacedBy(dimensiones.espaciado / 4)) {
         Canvas(
             modifier = Modifier
@@ -432,6 +584,7 @@ private fun RecorteFigura(bitmap: ImageBitmap, figura: FigureRef, dimensiones: D
                 srcSize = tamano,
                 dstOffset = IntOffset.Zero,
                 dstSize = IntSize(size.width.toInt(), size.height.toInt()),
+                colorFilter = filtro,
             )
         }
         if (!dentroDeLimites) {
