@@ -579,6 +579,7 @@ val DIBUJOS_OPCION: Map<Pair<String, String>, @Composable (Color, Modifier) -> U
 @Composable
 private fun DibujoIntestino(color: Color, modifier: Modifier = Modifier, fraccionAno: Float) {
     Canvas(modifier = modifier) {
+        if (size.minDimension <= 0f) return@Canvas
         val w = size.width
         val h = size.height
         val grosor = size.minDimension * 0.035f
@@ -651,6 +652,10 @@ private fun SelectorOpciones(clave: String, valores: List<String>, onElegir: (St
 @Composable
 private fun DibujoPendiente(color: Color, modifier: Modifier = Modifier) {
     Canvas(modifier = modifier) {
+        // Con la pantalla oculta (Box de 0dp en FlujoAnalisis) el lienzo mide
+        // 0: el punteado quedaria con intervalos de 0, que Skia rechaza y en
+        // escritorio revienta con "Can't wrap nullptr".
+        if (size.minDimension <= 0f) return@Canvas
         val grosor = size.minDimension * 0.03f
         drawRoundRect(
             color = color.copy(alpha = 0.4f),

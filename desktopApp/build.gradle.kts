@@ -25,7 +25,7 @@ compose.desktop {
             // "Aplicaciones instaladas". Fue "cal.cofi.atlas" hasta 1.1.0 y
             // "CalcofiLarvas" en 1.2.0.
             packageName = "CalcofiLarvae"
-            packageVersion = "1.2.2"
+            packageVersion = "1.3.1"
             description = "Larval fish identification with the CalCOFI Atlas 33"
 
             windows {
