@@ -24,6 +24,7 @@ private data class SpeciesDto(
     val life_history: LifeHistoryDto? = null,
     /** {"PrF": [min, max]}, con null en el extremo que la ficha no fija. */
     val stage_sizes: Map<String, List<Double?>> = emptyMap(),
+    val errata: List<String> = emptyList(),
 )
 
 /**
@@ -117,6 +118,7 @@ object AtlasLoader {
                     stageSizes = d.stage_sizes
                         .filterValues { it.size == 2 && (it[0] != null || it[1] != null) }
                         .mapValues { VentanaTalla(it.value[0], it.value[1]) },
+                    errata = d.errata.filter { it.isNotBlank() },
                 )
             }
 

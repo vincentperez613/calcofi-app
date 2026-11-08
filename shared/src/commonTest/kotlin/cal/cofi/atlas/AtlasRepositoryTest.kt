@@ -56,6 +56,27 @@ class AtlasRepositoryTest {
         assertTrue(listo.data.figures.any { it.needsReview }, "figure review flags are missing")
     }
 
+    /**
+     * La errata de CalCOFI llega aplicada: nombre nuevo con sus figuras, las
+     * vertebras de C. fragilis ya no invertidas, y el texto en la ficha.
+     */
+    @Test
+    fun cargaLaErrataDelAtlas() = runTest {
+        val data = assertIs<EstadoCarga.Listo>(AtlasRepository().cargar()).data
+        val especies = data.species.associateBy { it.id }
+
+        val milleri = especies.getValue("pseudobathylagus_milleri")
+        assertTrue(milleri.errata.any { "Bathylagus milleri" in it }, milleri.errata.toString())
+        assertTrue(data.figures.any { it.species == milleri.species }, "las figuras no siguieron al nombre nuevo")
+        assertTrue("bathylagus_milleri" !in especies, "quedo el nombre viejo")
+
+        val fragilis = especies.getValue("citharichthys_fragilis")
+        assertEquals(Range(10.0, 10.0), fragilis.meristics["Vertebrae: Precaudal"])
+        assertEquals(Range(26.0, 28.0), fragilis.meristics["Vertebrae: Caudal"])
+
+        assertTrue(especies.getValue("engraulis_mordax").errata.isEmpty())
+    }
+
     @Test
     fun lifeHistoryEsOpcionalYDescartaMesesImposibles() = runTest {
         val speciesJson = """

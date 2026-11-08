@@ -100,6 +100,14 @@ data class Species(
     val lifeHistory: LifeHistory? = null,
     /** Por codigo de etapa ("PrF", "F", "PoF"), como [sampleSizes]. */
     val stageSizes: Map<String, VentanaTalla> = emptyMap(),
+    /**
+     * Texto de la errata que CalCOFI publico despues de imprimir el atlas, en
+     * ingles y tal cual, una entrada por correccion. Lo que cambia un dato
+     * (nombre, conteo, talla por etapa, distribucion) ya viene aplicado en
+     * los demas campos; esto es para que el tecnico sepa por que la ficha no
+     * coincide con el libro impreso.
+     */
+    val errata: List<String> = emptyList(),
 ) {
     val genus: String get() = species.substringBefore(' ')
 

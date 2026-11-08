@@ -4499,7 +4499,7 @@
   "size_label": "5.1 mm",
   "stage": "PrF",
   "stage_source": "caption",
-  "species": "Opisthonema libertate",
+  "species": "Opisthonema sp.",
   "caption_taxon": null,
   "uncertain": false,
   "needs_review": true
@@ -4516,7 +4516,7 @@
   "size_label": "12.1 mm",
   "stage": "F",
   "stage_source": "caption",
-  "species": "Opisthonema libertate",
+  "species": "Opisthonema sp.",
   "caption_taxon": null,
   "uncertain": false,
   "needs_review": true
@@ -4533,7 +4533,7 @@
   "size_label": "19.2 mm",
   "stage": "PoF",
   "stage_source": "caption",
-  "species": "Opisthonema libertate",
+  "species": "Opisthonema sp.",
   "caption_taxon": null,
   "uncertain": false,
   "needs_review": true
@@ -4550,7 +4550,7 @@
   "size_label": "22.6 mm",
   "stage": "Tr",
   "stage_source": "caption",
-  "species": "Opisthonema libertate",
+  "species": "Opisthonema sp.",
   "caption_taxon": null,
   "uncertain": false,
   "needs_review": true
@@ -4941,7 +4941,7 @@
   "size_label": null,
   "stage": null,
   "stage_source": null,
-  "species": "Bathylagus bericoides",
+  "species": "Melanolagus bericoides",
   "caption_taxon": null,
   "uncertain": false,
   "needs_review": true
@@ -4958,7 +4958,7 @@
   "size_label": "7.3 mm",
   "stage": "PrF",
   "stage_source": "caption",
-  "species": "Bathylagus bericoides",
+  "species": "Melanolagus bericoides",
   "caption_taxon": null,
   "uncertain": false,
   "needs_review": true
@@ -4975,7 +4975,7 @@
   "size_label": "14.5 mm",
   "stage": "F",
   "stage_source": "caption",
-  "species": "Bathylagus bericoides",
+  "species": "Melanolagus bericoides",
   "caption_taxon": null,
   "uncertain": false,
   "needs_review": true
@@ -4992,7 +4992,7 @@
   "size_label": "17.7 mm",
   "stage": "PoF",
   "stage_source": "caption",
-  "species": "Bathylagus bericoides",
+  "species": "Melanolagus bericoides",
   "caption_taxon": null,
   "uncertain": false,
   "needs_review": true
@@ -5026,7 +5026,7 @@
   "size_label": null,
   "stage": null,
   "stage_source": null,
-  "species": "Bathylagus longirostris",
+  "species": "Dolicholagus longirostris",
   "caption_taxon": null,
   "uncertain": false,
   "needs_review": true
@@ -5043,7 +5043,7 @@
   "size_label": "20.1 mm",
   "stage": "PoF",
   "stage_source": "caption",
-  "species": "Bathylagus longirostris",
+  "species": "Dolicholagus longirostris",
   "caption_taxon": null,
   "uncertain": false,
   "needs_review": true
@@ -5060,7 +5060,7 @@
   "size_label": null,
   "stage": null,
   "stage_source": null,
-  "species": "Bathylagus milleri",
+  "species": "Pseudobathylagus milleri",
   "caption_taxon": null,
   "uncertain": false,
   "needs_review": true
@@ -5077,7 +5077,7 @@
   "size_label": "10.6 mm",
   "stage": "PrF",
   "stage_source": "caption",
-  "species": "Bathylagus milleri",
+  "species": "Pseudobathylagus milleri",
   "caption_taxon": null,
   "uncertain": false,
   "needs_review": true
@@ -5094,7 +5094,7 @@
   "size_label": "23.1 mm",
   "stage": "F",
   "stage_source": "media",
-  "species": "Bathylagus milleri",
+  "species": "Pseudobathylagus milleri",
   "caption_taxon": null,
   "uncertain": false,
   "needs_review": true
@@ -5111,7 +5111,7 @@
   "size_label": "27.5 mm",
   "stage": "PoF",
   "stage_source": "caption",
-  "species": "Bathylagus milleri",
+  "species": "Pseudobathylagus milleri",
   "caption_taxon": null,
   "uncertain": false,
   "needs_review": true
@@ -5128,7 +5128,7 @@
   "size_label": "13.0 mm",
   "stage": "F",
   "stage_source": "caption",
-  "species": "Bathylagus ochotensis",
+  "species": "Lipolagus ochotensis",
   "caption_taxon": null,
   "uncertain": false,
   "needs_review": true
@@ -5145,7 +5145,7 @@
   "size_label": null,
   "stage": null,
   "stage_source": null,
-  "species": "Bathylagus ochotensis",
+  "species": "Lipolagus ochotensis",
   "caption_taxon": null,
   "uncertain": false,
   "needs_review": true
@@ -5162,7 +5162,7 @@
   "size_label": "21.5 mm",
   "stage": "PoF",
   "stage_source": "caption",
-  "species": "Bathylagus ochotensis",
+  "species": "Lipolagus ochotensis",
   "caption_taxon": null,
   "uncertain": false,
   "needs_review": true
@@ -5179,7 +5179,7 @@
   "size_label": "25.5 mm",
   "stage": "Juv",
   "stage_source": "caption",
-  "species": "Bathylagus ochotensis",
+  "species": "Lipolagus ochotensis",
   "caption_taxon": null,
   "uncertain": false,
   "needs_review": true
@@ -5247,7 +5247,7 @@
   "size_label": "8.5 mm",
   "stage": "PrF",
   "stage_source": "media",
-  "species": "Bathylagus wesethi",
+  "species": "Bathylagoides wesethi",
   "caption_taxon": null,
   "uncertain": false,
   "needs_review": true
@@ -5264,7 +5264,7 @@
   "size_label": "1.0 mm",
   "stage": "Egg",
   "stage_source": "caption",
-  "species": "Bathylagus wesethi",
+  "species": "Bathylagoides wesethi",
   "caption_taxon": null,
   "uncertain": false,
   "needs_review": true
@@ -5281,7 +5281,7 @@
   "size_label": "11.3 mm",
   "stage": "F",
   "stage_source": "caption",
-  "species": "Bathylagus wesethi",
+  "species": "Bathylagoides wesethi",
   "caption_taxon": null,
   "uncertain": false,
   "needs_review": true
@@ -5298,7 +5298,7 @@
   "size_label": "20.5 mm",
   "stage": "PoF",
   "stage_source": "media",
-  "species": "Bathylagus wesethi",
+  "species": "Bathylagoides wesethi",
   "caption_taxon": null,
   "uncertain": false,
   "needs_review": true
@@ -5315,7 +5315,7 @@
   "size_label": null,
   "stage": null,
   "stage_source": null,
-  "species": "Bathylagus wesethi",
+  "species": "Bathylagoides wesethi",
   "caption_taxon": null,
   "uncertain": false,
   "needs_review": true
@@ -5332,7 +5332,7 @@
   "size_label": "1.0 mm",
   "stage": "Egg",
   "stage_source": "caption",
-  "species": "Bathylagus wesethi",
+  "species": "Bathylagoides wesethi",
   "caption_taxon": null,
   "uncertain": false,
   "needs_review": true
@@ -6573,7 +6573,7 @@
   "size_label": "7.0mm",
   "stage": "F",
   "stage_source": "caption",
-  "species": "Gonostoma ebelingi",
+  "species": "Sigmops ebelingi",
   "caption_taxon": null,
   "uncertain": false,
   "needs_review": true
@@ -6590,7 +6590,7 @@
   "size_label": "15.0 mm",
   "stage": "Tr",
   "stage_source": "caption",
-  "species": "Gonostoma ebelingi",
+  "species": "Sigmops ebelingi",
   "caption_taxon": null,
   "uncertain": false,
   "needs_review": true
@@ -6624,7 +6624,7 @@
   "size_label": "4.6mm",
   "stage": "PrF",
   "stage_source": "caption",
-  "species": "Gonostoma elongatum",
+  "species": "Sigmops elongatus",
   "caption_taxon": null,
   "uncertain": false,
   "needs_review": true
@@ -6658,7 +6658,7 @@
   "size_label": "9.8mm",
   "stage": "Tr",
   "stage_source": "caption",
-  "species": "Gonostoma elongatum",
+  "species": "Sigmops elongatus",
   "caption_taxon": null,
   "uncertain": false,
   "needs_review": true
@@ -7744,9 +7744,9 @@
   ],
   "size_mm": 3.7,
   "size_label": "3.7 mm",
-  "stage": "PrF",
-  "stage_source": "media",
-  "species": "Bathophilus flemingi",
+  "stage": "Y-S",
+  "stage_source": "caption",
+  "species": "Bathylagoides wesethi",
   "caption_taxon": null,
   "uncertain": false,
   "needs_review": true
@@ -7793,10 +7793,10 @@
    1102,
    1223
   ],
-  "size_mm": 3.7,
-  "size_label": "3.7 mm",
-  "stage": "PrF",
-  "stage_source": "media",
+  "size_mm": 23.6,
+  "size_label": "23.6 mm",
+  "stage": "PoF",
+  "stage_source": "caption",
   "species": "Bathophilus flemingi",
   "caption_taxon": null,
   "uncertain": false,
@@ -9633,7 +9633,7 @@
   "size_label": "3.5 mm",
   "stage": "PrF",
   "stage_source": "caption",
-  "species": "Nannobrachium idostigma",
+  "species": "Lampanyctus idostigma",
   "caption_taxon": null,
   "uncertain": false,
   "needs_review": true
@@ -9650,7 +9650,7 @@
   "size_label": null,
   "stage": null,
   "stage_source": null,
-  "species": "Nannobrachium \"niger\"",
+  "species": "Lampanyctus bristori",
   "caption_taxon": null,
   "uncertain": false,
   "needs_review": true
@@ -9667,7 +9667,7 @@
   "size_label": "3.7 mm",
   "stage": "PrF",
   "stage_source": "media",
-  "species": "Nannobrachium \"niger\"",
+  "species": "Lampanyctus bristori",
   "caption_taxon": null,
   "uncertain": false,
   "needs_review": true
@@ -9684,7 +9684,7 @@
   "size_label": "4.0mm",
   "stage": "PrF",
   "stage_source": "caption",
-  "species": "Nannobrachium \"no pectorals\"",
+  "species": "Lampanyctus hawaiiensis",
   "caption_taxon": null,
   "uncertain": false,
   "needs_review": true
@@ -9701,7 +9701,7 @@
   "size_label": null,
   "stage": null,
   "stage_source": null,
-  "species": "Nannobrachium \"no pectorals\"",
+  "species": "Lampanyctus hawaiiensis",
   "caption_taxon": null,
   "uncertain": false,
   "needs_review": true
@@ -9718,7 +9718,7 @@
   "size_label": "4.0 mm",
   "stage": "PrF",
   "stage_source": "caption",
-  "species": "Nannobrachium \"no pectorals\"",
+  "species": "Lampanyctus hawaiiensis",
   "caption_taxon": null,
   "uncertain": false,
   "needs_review": true
@@ -9752,7 +9752,7 @@
   "size_label": "4.7 mm",
   "stage": "PrF",
   "stage_source": "caption",
-  "species": "Nannobrachium ritteri",
+  "species": "Lampanyctus ritteri",
   "caption_taxon": null,
   "uncertain": false,
   "needs_review": true
@@ -23692,7 +23692,7 @@
   "size_label": "5.6mm",
   "stage": "F",
   "stage_source": "caption",
-  "species": "Coryphopterus nicholsii",
+  "species": "Rhinogobiops nicholsii",
   "caption_taxon": null,
   "uncertain": false,
   "needs_review": true
@@ -23709,7 +23709,7 @@
   "size_label": null,
   "stage": null,
   "stage_source": null,
-  "species": "Coryphopterus nicholsii",
+  "species": "Rhinogobiops nicholsii",
   "caption_taxon": null,
   "uncertain": false,
   "needs_review": true
@@ -23726,7 +23726,7 @@
   "size_label": "14.0 mm",
   "stage": "PoF",
   "stage_source": "caption",
-  "species": "Coryphopterus nicholsii",
+  "species": "Rhinogobiops nicholsii",
   "caption_taxon": null,
   "uncertain": false,
   "needs_review": true
@@ -23743,7 +23743,7 @@
   "size_label": null,
   "stage": null,
   "stage_source": null,
-  "species": "Coryphopterus nicholsii",
+  "species": "Rhinogobiops nicholsii",
   "caption_taxon": null,
   "uncertain": false,
   "needs_review": true

@@ -81,6 +81,8 @@ internal fun ColumnScope.DetalleEspecie(
         Text("Family: ${especie.family}", fontSize = dimensiones.tamanoTextoBase)
         Text("Atlas page: ${especie.pdfPage}", fontSize = dimensiones.tamanoTextoBase)
 
+        SeccionErrata(especie.errata, dimensiones)
+
         if (especie.meristics.isNotEmpty()) {
             Column(verticalArrangement = Arrangement.spacedBy(dimensiones.espaciado / 4)) {
                 Text("Meristics", fontSize = dimensiones.tamanoTextoTitulo, fontWeight = FontWeight.Bold)
@@ -138,6 +140,28 @@ private fun SeccionHistoriaDeVida(lh: LifeHistory?, dimensiones: Dimensiones) {
         }
         lh.range?.let { Text("Range: “$it”", fontSize = dimensiones.tamanoTextoBase) }
         lh.habitat?.let { Text("Habitat: “$it”", fontSize = dimensiones.tamanoTextoBase) }
+    }
+}
+
+/**
+ * Erratas que CalCOFI publico despues de imprimir el atlas. Va arriba de los
+ * datos porque explica por que no coinciden con el libro: un nombre que
+ * cambio de genero, unas vertebras que estaban invertidas.
+ */
+@Composable
+private fun SeccionErrata(errata: List<String>, dimensiones: Dimensiones) {
+    if (errata.isEmpty()) return
+    Column(verticalArrangement = Arrangement.spacedBy(dimensiones.espaciado / 4)) {
+        Text("Atlas errata", fontSize = dimensiones.tamanoTextoTitulo, fontWeight = FontWeight.Bold)
+        Text(
+            "Corrections published by CalCOFI after the atlas was printed. Names, counts, " +
+                "stage sizes and ranges on this page already include them.",
+            fontSize = dimensiones.tamanoTextoBase,
+            fontStyle = FontStyle.Italic,
+        )
+        for (nota in errata) {
+            Text(nota, fontSize = dimensiones.tamanoTextoBase)
+        }
     }
 }
 
